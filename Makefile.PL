@@ -15,8 +15,15 @@ all_from 'lib/Catalyst/Plugin/LanguagePrefix.pm';
 readme_from 'lib/Catalyst/Plugin/LanguagePrefix.pm';
 auto_set_repository;
 
+#FIXME remove unused modules
 requires 'Catalyst' => '5.80013';
 requires 'Catalyst::Plugin::I18N' => '0.09';
+requires 'I18N::LangTags::List' => '0.35';
+requires 'Moose' => '0.92';
+requires 'namespace::autoclean' => '0.09';
+requires 'List::Util' => '1.19';
+requires 'List::MoreUtils' => '0.22';
+requires 'Scope::Guard' => '0.03';
 
 #FIXME remove unused test modules
 test_requires 'Test::Most' => '0.21';
