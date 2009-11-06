@@ -49,7 +49,7 @@ our $VERSION = '0.01';
   #                                      dispatcher sees /foo/bar
 
   # in a controller
-  sub language_switch : Local
+  sub language_switch : Private
   {
     # the template will display the language switch
     $c->stash('language_switch' => $c->language_switch_options);
@@ -61,19 +61,26 @@ This is ALPHA SOFTWARE. Use at your own risk. Features may change.
 
 =head1 DESCRIPTION
 
-This module lets you put the language selector as a prefix to the path part of
-the request URI.
+This module allows you to put the language selector as a prefix to the path part of
+the request URI without requiring any modifications to the controllers (like
+restructuring all the controllers to chain from a common base controller).
 
-Note: HTTP already had a mechanism for letting the user specify the language
-(ie. Accept-Language header). Unfortunately users often don't set it properly,
-but more importantly Googlebot does not support it (but requires that you
-always serve documents of the same language in the same URI). So if you want a
-SEO-optimized multi-lingual site, you have to have different (sub)domains for
-the different languages, or resort to putting the language selector into the
-URL.
+(Internally it strips the language code from C<< $c->req->path >> and appends
+it to C<< $c->req->base >> so that the invariant C<< $c->req->uri eq
+$c->req->base . $c->req->path >> still remains valid, but the dispatcher does
+not see the language code - it uses C<< $c->req->path >> only.)
 
 Throughout this document 'language code' means ISO 639-1 2-letter language
-codes, case insensitively (eg. 'en', 'de', 'it', 'EN').
+codes, case insensitively (eg. 'en', 'de', 'it', 'EN'), just like
+L<I18N::LangTags> supports them.
+
+Note: HTTP already have a standard way (ie. Accept-Language header) to allow
+the user specify the language (s)he prefers the page to be delivered in.
+Unfortunately users often don't set it properly, but more importantly Googlebot
+does not really support it (but requires that you always serve documents of the
+same language on the same URI). So if you want a SEO-optimized multi-lingual
+site, you have to have different (sub)domains for the different languages, or
+resort to putting the language selector into the URL.
 
 =cut
 
@@ -100,6 +107,11 @@ rewrite C<< $c->req->uri >>, C<< $c->req->base >> and C<< $c->req->path >>).
 
 Use a regex that matches all your paths that return language independent
 information.
+
+=head2 debug => $boolean
+
+If set to a true value, L</prepare_language_prefix> logs its actions (using C<<
+$c->log->debug(...) >>).
 
 =cut
 
@@ -178,23 +190,38 @@ sub prepare_language_prefix
   my $language_code = $config->{fallback_language_prefix};
 
   if ($c->req->path !~ $config->{language_independent_paths}) {
-    my @path_chunks = split m{/}, $c->req->path, 1;
+    my @path_chunks = split m{/}, $c->req->path, 2;
 
     if (@path_chunks && exists $valid_language_codes{ $path_chunks[0] }) {
-      $language_code = shift @path_chunks;
+      $language_code = $path_chunks[0];
 
+      $c->_language_prefix_debug("found language prefix '$language_code' "
+        . "in path '" . $c->req->path . "'");
+
+      #FIXME test with /, /en, /en/, /en/foo
+      # set the path to the remaining path after stripping the language code prefix
       $c->req->path($path_chunks[1]);
-    } else {
+    }
+    else {
       my $detected_language_code =
         first { exists $valid_language_codes{$_} } $c->languages;
 
+      $c->_language_prefix_debug("detected language: "
+        . ($detected_language_code ? "'$detected_language_code'" : "N/A"));
+
       $language_code = $detected_language_code if $detected_language_code;
 
+      # fake that the request path already contained the language code prefix
       $c->req->uri($language_code . '/' . $c->req->path);
+
+      $c->_language_prefix_debug("set language prefix to '$language_code' ");
     }
 
     my $req_base = $c->req->base;
     $req_base->path($req_base->path . '/' . $language_code);
+  }
+  else {
+    $c->_language_prefix_debug("path " . $c->req->path . " is language independent");
   }
 
   $c->set_language_from_language_prefix($languge_code);
@@ -237,29 +264,27 @@ sub set_language_from_language_prefix
 
 Returns: C<$uri_object>
 
+The same as L<Catalyst/uri_for> but returns the URI with the C<$language_code>
+path prefix (independently of what the current language is).
+
+Internally this method temporarily sets the paths in C<< $c->req >>, calls
+L<Catalyst/uri_for> then resets the paths. Ineffective, but you usually call it
+very infrequently.
+
+Note: This module intentionally does not override L<Catalyst/uri_for> but
+provides this method instead: L<Catalyst/uri_for> is usually called many times
+per request, and most of the cases you want it to use the current language; not
+overriding it can be a significant performance saving. YMMV.
+
 =cut
 
 sub in_language_uri_for
 {
   my ($c, $language_code, @uri_for_args) = (shift, @_);
 
-  my $old_req_uri = $c->req->uri;
-  my $old_req_base = $c->req->base;
-  my $old_req_path = $c->req->path;
+  my $scope_guard = $c->_set_language_prefix_temporarily($language_code);
 
-  my $sg = Scope::Guard->new(sub {
-    $c->req->uri($old_req_uri);
-    $c->req->base($old_req_base);
-    $c->req->path($old_req_path);
-  });
-
-  my $old_req_uri_
-
-  $c->req->uri($old_req_uri);
-  $c->req->base($old_req_base);
-  $c->req->path($old_req_path);
-
-  #FIXME implement
+  return $c->uri_for(@uri_for_args);
 }
 
 
@@ -316,6 +341,25 @@ Returns a data structure that contains all the necessary data (language code,
 name, URL of the same page) for displaying a language switch widget on the
 page.
 
+The data structure is a hashref with one key for each valid language code (see
+the L</valid_languages> config option) (in all-lowercase format) and the value
+is a hashref that contains the following key-value pairs:
+
+=over
+
+=item name
+
+The localized (translated) name of the language. (The actual msgids used in C<<
+$c->loc() >> is the English name of the language, returned by
+L<I18N::LangTags::List/name>.)
+
+=item url
+
+The URL of the equivalent of the current page in that language (ie. the
+language prefix replaced).
+
+=back
+
 TODO include example TT2 template for the language switch
 
 =cut
@@ -339,8 +383,10 @@ sub language_switch_options
 
   $c->_set_language_prefix($language_code)
 
-Sets the language to C<$language_code>: Mangles C<< $c->req->uri >>, C<<
-$c->req->base >> and C<< $c->req->path >>.
+Sets the language to C<$language_code>: Mangles C<< $c->req->uri >> and C<<
+$c->req->base >>.
+
+=end internal
 
 =cut
 
@@ -348,7 +394,14 @@ sub _set_language_prefix
 {
   my ($c, $language_code) = (shift, @_);
 
-  #FIXME implement
+  if ($c->req->path !~ $config->{language_independent_paths}) {
+    my ($actual_base) = $c->req->base->path =~ m{^(.*)/[^/]+/?$};
+
+    $c->req->base->path($actual_base . '/' . $language_code);
+
+    my @uri_path_chunks = split m{/}, $c->req->uri->path, 2;
+    $c->req->uri->path($language_code . '/' . $uri_path_chunks[1]);
+  }
 }
 
 
@@ -359,6 +412,8 @@ sub _set_language_prefix
 Sets the language prefix temporarily (does the same as L</_set_language_prefix>
 but returns a L<Scope::Guard> instance that resets the these on destruction).
 
+=end internal
+
 =cut
 
 sub _set_language_prefix_temporarily
@@ -367,17 +422,35 @@ sub _set_language_prefix_temporarily
 
   my $old_req_uri = $c->req->uri;
   my $old_req_base = $c->req->base;
-  my $old_req_path = $c->req->path;
 
   my $scope_guard = Scope::Guard->new(sub {
     $c->req->uri($old_req_uri);
     $c->req->base($old_req_base);
-    $c->req->path($old_req_path);
   });
 
   $c->_set_language_prefix($language_code);
 
   return $scope_guard;
+}
+
+
+=begin internal
+
+  $c->_language_prefix_debug($message)
+
+Logs C<$message> using C<< $c->log->debug("LanguagePrefix: $message") >> if the
+L</debug> config option is true.
+
+=end internal
+
+=cut
+
+sub _language_prefix_debug
+{
+  my ($self, $message) = (shift, @_);
+
+  $c->log->debug("LanguagePrefix: $message")
+    if $c->config->{LanguagePrefix}->{debug};
 }
 
 
@@ -434,8 +507,8 @@ L<http://search.cpan.org/dist/Catalyst-Plugin-LanguagePrefix/>
 =head1 ACKNOWLEDGEMENTS
 
 Thanks for Larry Leszczynski for the idea of appending the language prefix to
-$c->req->base after it's split off of $c->req->path
-(http://dev.catalystframework.org/wiki/wikicookbook/urlpathprefixing).
+C<< $c->req->base >> after it's split off of C<< $c->req->path >>
+(L<http://dev.catalystframework.org/wiki/wikicookbook/urlpathprefixing>).
 
 =head1 COPYRIGHT & LICENSE
 
