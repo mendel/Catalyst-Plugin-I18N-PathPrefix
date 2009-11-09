@@ -110,7 +110,7 @@ information.
 
 =head2 debug => $boolean
 
-If set to a true value, L</prepare_language_prefix> logs its actions (using C<<
+If set to a true value, L</prepare_path_prefix> logs its actions (using C<<
 $c->log->debug(...) >>).
 
 =cut
@@ -124,20 +124,20 @@ $c->log->debug(...) >>).
 
 Overridden from L<Catalyst/prepare_path>.
 
-Calls C<< $c->prepare_language_prefix >> after the original method.
+Calls C<< $c->prepare_path_prefix >> after the original method.
 
 =cut
 
 after prepare_path => sub {
   my ($c) = (shift, @_);
 
-  $c->prepare_language_prefix;
+  $c->prepare_path_prefix;
 };
 
 
-=head2 prepare_language_prefix
+=head2 prepare_path_prefix
 
-  $c->prepare_language_prefix()
+  $c->prepare_path_prefix()
 
 Returns: N/A
 
@@ -176,7 +176,7 @@ with that language code.
 # should be a 'state' var on Perl 5.10+
 my %valid_language_codes;
 
-sub prepare_language_prefix
+sub prepare_path_prefix
 {
   my ($c) = (shift, @_);
 
@@ -236,13 +236,13 @@ Returns: N/A
 
 Sets C<< $c->language >> to C<$language_code>.
 
-Called from both L</prepare_language_prefix> and L</switch_language> (ie.
+Called from both L</prepare_path_prefix> and L</switch_language> (ie.
 always called when C<< $c->language >> is set by this module).
 
 You can wrap this method (using eg. the L<Moose/after> method modifier) so you
 can store the language code into the stash if you like:
 
-  after prepare_language_prefix => sub {
+  after prepare_path_prefix => sub {
     my $c = shift;
 
     $c->stash('language' => $c->language);
