@@ -1,6 +1,9 @@
-#!perl -T
+#!/usr/bin/env perl -T
 
-use Test::More tests => 1;
+use strict;
+use warnings;
+
+use Test::Most tests => 1;
 
 BEGIN {
 	use_ok( 'Catalyst::Plugin::LanguagePrefix' );

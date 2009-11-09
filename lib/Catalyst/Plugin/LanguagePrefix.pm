@@ -1,6 +1,6 @@
 package Catalyst::Plugin::LanguagePrefix;
 
-use Moose;
+use Moose::Role;
 use namespace::autoclean;
 
 use List::Util qw(first);
@@ -23,13 +23,13 @@ our $VERSION = '0.01';
 
   # in MyApp.pm
   use Catalyst;
-  MyApp->setup( qw/LanguagePrefix/ );
+  MyApp->setup( qw/I18N LanguagePrefix/ );
 
-  MyApp->config->{LanguagePrefix} => {
+  MyApp->config->{'Plugin::LanguagePrefix'} => {
     valid_languages => ['en', 'de', 'fr'],
     fallback_language => 'en',
     language_independent_paths => qr{
-        ^( /votes/ | /captcha/numeric/ )
+        ^( votes/ | captcha/numeric/ )
     }x,
   };
 
@@ -74,6 +74,8 @@ Throughout this document 'language code' means ISO 639-1 2-letter language
 codes, case insensitively (eg. 'en', 'de', 'it', 'EN'), just like
 L<I18N::LangTags> supports them.
 
+Note: You have to load L<Catalyst::Plugin::I18N> if you load this plugin.
+
 Note: HTTP already have a standard way (ie. Accept-Language header) to allow
 the user specify the language (s)he prefers the page to be delivered in.
 Unfortunately users often don't set it properly, but more importantly Googlebot
@@ -86,7 +88,8 @@ resort to putting the language selector into the URL.
 
 =head1 CONFIGURATION
 
-You can use these configuration options under the C<LanguagePrefix> key:
+You can use these configuration options under the C<'Plugin::LanguagePrefix'>
+key:
 
 =head2 valid_languages => \@language_codes
 
@@ -142,14 +145,14 @@ after prepare_path => sub {
 Returns: N/A
 
 If C<< $c->req->path >> is matched by the L</language_independent_paths>
-configuration option then calls C<< $c->set_language_from_language_prefix >>
+configuration option then calls C<< $c->set_languages_from_language_prefix >>
 with the value of the L</fallback_language> configuration option and
 returns.
 
 Otherwise, if C<< $c->req->path >> starts with a language code listed in the
 L</valid_languages> configuration option, then splits language prefix from C<<
 $c->req->path >> then appends it to C<< $c->req->base >> and calls C<<
-$c->set_language_from_language_prefix >> with this language prefix.
+$c->set_languages_from_language_prefix >> with this language prefix.
 
 Otherwise, it tries to select an appropriate language code:
 
@@ -168,7 +171,7 @@ configuration option.
 =back
 
 Then appends this language code to C<< $c->req->base >> and the path part of
-C<< $c->req->uri >>, finally calls C<< $c->set_language_from_language_prefix >>
+C<< $c->req->uri >>, finally calls C<< $c->set_languages_from_language_prefix >>
 with that language code.
 
 =cut
@@ -180,7 +183,7 @@ sub prepare_path_prefix
 {
   my ($c) = (shift, @_);
 
-  my $config = $c->config->{LanguagePrefix};
+  my $config = $c->config->{'Plugin::LanguagePrefix'};
 
   # fill the hash for quick lookups if not done yet
   if (!%valid_language_codes) {
@@ -198,13 +201,12 @@ sub prepare_path_prefix
       $c->_language_prefix_debug("found language prefix '$language_code' "
         . "in path '" . $c->req->path . "'");
 
-      #FIXME test with /, /en, /en/, /en/foo
       # set the path to the remaining path after stripping the language code prefix
       $c->req->path($path_chunks[1]);
     }
     else {
       my $detected_language_code =
-        first { exists $valid_language_codes{$_} } $c->languages;
+        first { exists $valid_language_codes{$_} } @{ $c->languages };
 
       $c->_language_prefix_debug("detected language: "
         . ($detected_language_code ? "'$detected_language_code'" : "N/A"));
@@ -212,32 +214,32 @@ sub prepare_path_prefix
       $language_code = $detected_language_code if $detected_language_code;
 
       # fake that the request path already contained the language code prefix
-      $c->req->uri($language_code . '/' . $c->req->path);
+      $c->req->uri->path($language_code . '/' . $c->req->path);
 
       $c->_language_prefix_debug("set language prefix to '$language_code' ");
     }
 
     my $req_base = $c->req->base;
-    $req_base->path($req_base->path . '/' . $language_code);
+    $req_base->path($req_base->path . $language_code . '/');
   }
   else {
-    $c->_language_prefix_debug("path " . $c->req->path . " is language independent");
+    $c->_language_prefix_debug("path '" . $c->req->path . "' is language independent");
   }
 
-  $c->set_language_from_language_prefix($languge_code);
+  $c->set_languages_from_language_prefix($language_code);
 }
 
 
-=head2 $c->set_language_from_language_prefix(
+=head2 $c->set_languages_from_language_prefix(
 
-  $c->set_language_from_language_prefix($languge_code)
+  $c->set_languages_from_language_prefix($languge_code)
 
 Returns: N/A
 
-Sets C<< $c->language >> to C<$language_code>.
+Sets C<< $c->languages >> to C<$language_code>.
 
 Called from both L</prepare_path_prefix> and L</switch_language> (ie.
-always called when C<< $c->language >> is set by this module).
+always called when C<< $c->languages >> is set by this module).
 
 You can wrap this method (using eg. the L<Moose/after> method modifier) so you
 can store the language code into the stash if you like:
@@ -250,11 +252,11 @@ can store the language code into the stash if you like:
 
 =cut
 
-sub set_language_from_language_prefix
+sub set_languages_from_language_prefix
 {
   my ($c, $language_code) = (shift, @_);
 
-  $c->language($language_code);
+  $c->languages([$language_code]);
 }
 
 
@@ -295,7 +297,7 @@ sub uri_in_language_for
 Returns: N/A
 
 Changes C<< $c->req->base >> to end with C<$language_code> and calls C<<
-$c->set_language_from_language_prefix >> with C<$language_code>.
+$c->set_languages_from_language_prefix >> with C<$language_code>.
 
 Useful if you want to switch the language later in the request processing (eg.
 from a request parameter, from the session or from the user object).
@@ -308,7 +310,7 @@ sub switch_language
 
   $c->_set_language_prefix($language_code);
 
-  $c->set_language_from_language_prefix($language_code);
+  $c->set_languages_from_language_prefix($language_code);
 }
 
 
@@ -355,7 +357,7 @@ sub language_switch_options
         name => $c->loc(I18N::LangTags::List::name($_)),
         uri => $c->uri_in_language_for($_ => $c->req->uri),
       }
-    } @{ $c->config->{LanguagePrefix}->{valid_languages} }
+    } @{ $c->config->{'Plugin::LanguagePrefix'}->{valid_languages} }
   };
 }
 
@@ -375,7 +377,7 @@ sub _set_language_prefix
 {
   my ($c, $language_code) = (shift, @_);
 
-  if ($c->req->path !~ $config->{language_independent_paths}) {
+  if ($c->req->path !~ $c->config->{language_independent_paths}) {
     my ($actual_base) = $c->req->base->path =~ m{^(.*)/[^/]+/?$};
 
     $c->req->base->path($actual_base . '/' . $language_code);
@@ -428,10 +430,10 @@ L</debug> config option is true.
 
 sub _language_prefix_debug
 {
-  my ($self, $message) = (shift, @_);
+  my ($c, $message) = (shift, @_);
 
   $c->log->debug("LanguagePrefix: $message")
-    if $c->config->{LanguagePrefix}->{debug};
+    if $c->config->{'Plugin::LanguagePrefix'}->{debug};
 }
 
 
