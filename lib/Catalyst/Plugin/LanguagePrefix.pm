@@ -27,7 +27,7 @@ our $VERSION = '0.01';
 
   MyApp->config->{LanguagePrefix} => {
     valid_languages => ['en', 'de', 'fr'],
-    default_language_prefix => 'en',
+    fallback_language => 'en',
     language_independent_paths => qr{
         ^( /votes/ | /captcha/numeric/ )
     }x,
@@ -92,7 +92,7 @@ You can use these configuration options under the C<LanguagePrefix> key:
 
 The language codes that are accepted as path prefix.
 
-=head2 fallback_language_prefix => $language_code
+=head2 fallback_language => $language_code
 
 The fallback language code used if the URL contains no language prefix and
 L<Catalyst::Plugin::I18N> cannot auto-detect the preferred language from the
@@ -143,7 +143,7 @@ Returns: N/A
 
 If C<< $c->req->path >> is matched by the L</language_independent_paths>
 configuration option then calls C<< $c->set_language_from_language_prefix >>
-with the value of the L</fallback_language_prefix> configuration option and
+with the value of the L</fallback_language> configuration option and
 returns.
 
 Otherwise, if C<< $c->req->path >> starts with a language code listed in the
@@ -162,7 +162,7 @@ the L</valid_languages> configuration option.
 
 =item *
 
-If no such language code, uses the value of the L</fallback_language_prefix>
+If no such language code, uses the value of the L</fallback_language>
 configuration option.
 
 =back
@@ -187,7 +187,7 @@ sub prepare_path_prefix
     @valid_language_codes{ @{ $config->{valid_languages} } } = ();
   }
 
-  my $language_code = $config->{fallback_language_prefix};
+  my $language_code = $config->{fallback_language};
 
   if ($c->req->path !~ $config->{language_independent_paths}) {
     my @path_chunks = split m{/}, $c->req->path, 2;
