@@ -258,9 +258,9 @@ sub set_language_from_language_prefix
 }
 
 
-=head2 in_language_uri_for
+=head2 uri_in_language_for
 
-  $c->in_language_uri_for($language_code => @uri_for_args)
+  $c->uri_in_language_for($language_code => @uri_for_args)
 
 Returns: C<$uri_object>
 
@@ -278,32 +278,13 @@ overriding it can be a significant performance saving. YMMV.
 
 =cut
 
-sub in_language_uri_for
+sub uri_in_language_for
 {
   my ($c, $language_code, @uri_for_args) = (shift, @_);
 
   my $scope_guard = $c->_set_language_prefix_temporarily($language_code);
 
   return $c->uri_for(@uri_for_args);
-}
-
-
-=head2 current_uri_in_language
-
-  $c->current_uri_in_language($language_code)
-
-Returns: C<$uri_object>
-
-Calculates the URL that correspods to C<< $c->req->path >> in the language
-identified by C<$language_code>.
-
-=cut
-
-sub current_uri_in_language
-{
-  my ($c, $language_code) = (shift, @_);
-
-  return $c->in_language_uri_for($language_code => $c->req->path);
 }
 
 
@@ -372,7 +353,7 @@ sub language_switch_options
     map {
       $_ => {
         name => $c->loc(I18N::LangTags::List::name($_)),
-        uri => $c->current_uri_in_language($_),
+        uri => $c->uri_in_language_for($_ => $c->req->uri),
       }
     } @{ $c->config->{LanguagePrefix}->{valid_languages} }
   };
