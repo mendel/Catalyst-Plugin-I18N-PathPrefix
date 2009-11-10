@@ -241,7 +241,7 @@ sub prepare_path_prefix
 }
 
 
-=head2 $c->set_languages_from_language_prefix(
+=head2 set_languages_from_language_prefix(
 
   $c->set_languages_from_language_prefix($languge_code)
 
