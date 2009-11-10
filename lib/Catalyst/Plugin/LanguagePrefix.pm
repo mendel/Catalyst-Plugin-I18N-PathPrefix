@@ -193,16 +193,16 @@ sub prepare_path_prefix
   my $language_code = $config->{fallback_language};
 
   if ($c->req->path !~ $config->{language_independent_paths}) {
-    my @path_chunks = split m{/}, $c->req->path, 2;
+    my ($prefix, $path) = split m{/}, $c->req->path, 2;
 
-    if (@path_chunks && exists $valid_language_codes{ $path_chunks[0] }) {
-      $language_code = $path_chunks[0];
+    if (defined $prefix && exists $valid_language_codes{$prefix}) {
+      $language_code = $prefix;
 
       $c->_language_prefix_debug("found language prefix '$language_code' "
         . "in path '" . $c->req->path . "'");
 
       # set the path to the remaining path after stripping the language code prefix
-      $c->req->path($path_chunks[1]);
+      $c->req->path($path);
     }
     else {
       my $detected_language_code =
