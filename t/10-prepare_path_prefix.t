@@ -13,34 +13,34 @@ use HTTP::Request::Common;
 use Catalyst::Test 'TestApp';
 use Data::Dumper;
 
-# * request for a language independent path
-#  * language set to fallback_language
-#  * $c->req->uri, $c->req->base, $c->req->path are as expected
-#  * the right action is chosen
-# * request for a valid language
-#  * language set to the prefix language code
-#  * $c->req->uri, $c->req->base, $c->req->path are as expected
-#  * the right action is chosen
-# * request for an invalid language
-#  * language set to the Accept-Language language
-#  * $c->req->uri, $c->req->base, $c->req->path are as expected
-#  * the default action is chosen
-# * request without a language prefix, with Accept-Language
-#  * language set to the Accept-Language language
-#  * $c->req->uri, $c->req->base, $c->req->path are as expected
-#  * the right action is chosen
-# * request without a language prefix, without Accept-Language
-#  * language set to fallback_language
-#  * $c->req->uri, $c->req->base, $c->req->path are as expected
-#  * the right action is chosen
-# * request for /, /en, /en/, /en/foo/bar
-# * request without Accept-Language with different fallback_language values
-# * debug
+#TODO whether it's cleaner to monkey-patch $c->_language_prefix_debug instead of subclassing Catalyst::Log and filtering on the message prefix?
 
+# Each element is a hashref, with the following key-value pairs:
+#   path: The path part of the URI to request.
+#   accept_language: An arrayref, contains language codes to set the
+#     Accept-Language request header to before the request.
+#   fallback_language: The language code to set
+#     $c->config->{'Plugin::LanguagePrefix'}->{fallback_language} to before
+#     the request.
+#   expected: A hashref that contains the expected values after the request.
+#     It contains following key-value pairs:
+#       language: The expected value of $c->language.
+#       req: The expected value of some $c->req methods. A hashref with the
+#         following key-value pairs:
+#           uri: The expected value of $c->req->uri.
+#           base: The expected value of $c->req->base.
+#           path: The expected value of $c->req->path.
+#       action: The fully qualified name of the action the dispatcher is
+#         expected to dispatch the request.
+#       log: The expected messages logged by the plugin. An arrayref that
+#         contains pairs of values, where the first value is the log level
+#         string (see L<Catalyst::Log> for the valid log levels) and the second
+#         value is the message.
 my @tests = (
   {
     path => '/language_independent_stuff',
     accept_language => ['de'],
+    fallback_language => 'en',
     expected => {
       language => 'en',
       req => {
@@ -49,12 +49,18 @@ my @tests = (
         path => 'language_independent_stuff',
       },
       action => 'TestApp::Controller::Root::language_independent_stuff',
+      log => [
+        debug =>
+          'LanguagePrefix: path \'language_independent_stuff\' '
+            . 'is language independent',
+      ],
     },
   },
 
   {
     path => '/fr',
     accept_language => ['de'],
+    fallback_language => 'en',
     expected => {
       language => 'fr',
       req => {
@@ -63,11 +69,15 @@ my @tests = (
         path => '',
       },
       action => 'TestApp::Controller::Root::index',
+      log => [
+        debug => 'LanguagePrefix: found language prefix \'fr\' in path \'fr\'',
+      ],
     },
   },
   {
     path => '/fr/',
     accept_language => ['de'],
+    fallback_language => 'en',
     expected => {
       language => 'fr',
       req => {
@@ -76,11 +86,15 @@ my @tests = (
         path => '',
       },
       action => 'TestApp::Controller::Root::index',
+      log => [
+        debug => 'LanguagePrefix: found language prefix \'fr\' in path \'fr/\'',
+      ],
     },
   },
   {
     path => '/fr/foo/bar',
     accept_language => ['de'],
+    fallback_language => 'en',
     expected => {
       language => 'fr',
       req => {
@@ -89,12 +103,16 @@ my @tests = (
         path => 'foo/bar',
       },
       action => 'TestApp::Controller::Foo::bar',
+      log => [
+        debug => 'LanguagePrefix: found language prefix \'fr\' in path \'fr/foo/bar\'',
+      ],
     },
   },
 
   {
     path => '/hu/foo/bar',
     accept_language => ['de'],
+    fallback_language => 'en',
     expected => {
       language => 'de',
       req => {
@@ -103,12 +121,17 @@ my @tests = (
         path => 'hu/foo/bar',
       },
       action => 'TestApp::Controller::Root::default',
+      log => [
+        debug => 'LanguagePrefix: detected language: \'de\'',
+        debug => 'LanguagePrefix: set language prefix to \'de\'',
+      ],
     },
   },
 
   {
     path => '/foo/bar',
     accept_language => ['de'],
+    fallback_language => 'en',
     expected => {
       language => 'de',
       req => {
@@ -117,11 +140,16 @@ my @tests = (
         path => 'foo/bar',
       },
       action => 'TestApp::Controller::Foo::bar',
+      log => [
+        debug => 'LanguagePrefix: detected language: \'de\'',
+        debug => 'LanguagePrefix: set language prefix to \'de\'',
+      ],
     },
   },
   {
     path => '/foo/bar',
     accept_language => [],
+    fallback_language => 'en',
     expected => {
       language => 'en',
       req => {
@@ -130,6 +158,49 @@ my @tests = (
         path => 'foo/bar',
       },
       action => 'TestApp::Controller::Foo::bar',
+      log => [
+        debug => 'LanguagePrefix: detected language: N/A',
+        debug => 'LanguagePrefix: set language prefix to \'en\'',
+      ],
+    },
+  },
+
+  {
+    path => '/language_independent_stuff',
+    accept_language => ['de'],
+    fallback_language => 'fr',
+    expected => {
+      language => 'fr',
+      req => {
+        uri => 'http://localhost/language_independent_stuff',
+        base => 'http://localhost/',
+        path => 'language_independent_stuff',
+      },
+      action => 'TestApp::Controller::Root::language_independent_stuff',
+      log => [
+        debug =>
+          'LanguagePrefix: path \'language_independent_stuff\' '
+            . 'is language independent',
+      ],
+    },
+  },
+
+  {
+    path => '/foo/bar',
+    accept_language => [],
+    fallback_language => 'fr',
+    expected => {
+      language => 'fr',
+      req => {
+        uri => 'http://localhost/fr/foo/bar',
+        base => 'http://localhost/fr/',
+        path => 'foo/bar',
+      },
+      action => 'TestApp::Controller::Foo::bar',
+      log => [
+        debug => 'LanguagePrefix: detected language: N/A',
+        debug => 'LanguagePrefix: set language prefix to \'fr\'',
+      ],
     },
   },
 );
@@ -141,9 +212,14 @@ my @tests = (
         +{
           map {
             ( $_ => $test->{$_} )
-          } qw(path accept_language)
+          } qw(path accept_language fallback_language)
         }
       ])->Terse(1)->Indent(0)->Quotekeys(0)->Dump;
+
+    TestApp->config->{'Plugin::LanguagePrefix'}->{fallback_language}
+      = $test->{fallback_language} if exists $test->{fallback_language};
+
+    TestApp->log->clear_languageprefix_plugin_log;
 
     my ($response, $c) = ctx_request(
       GET $test->{path},
@@ -183,6 +259,13 @@ my @tests = (
       $c->req->path,
       $test->{expected}->{req}->{path},
       "\$c->req->path is set to the expected value ($test_description)"
+    );
+
+    eq_or_diff(
+      $c->log->languageprefix_plugin_log,
+      $test->{expected}->{log},
+      "The plugin logged only the expected messages during the request "
+        . "($test_description)"
     );
   }
 }

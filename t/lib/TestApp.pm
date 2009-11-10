@@ -4,6 +4,7 @@ use strict;
 use warnings;
 
 use Catalyst::Runtime 5.80;
+use TestApp::Logger;
 
 use parent qw(Catalyst);
 
@@ -20,6 +21,8 @@ __PACKAGE__->config(
     debug => 1,
   },
 );
+
+__PACKAGE__->log( TestApp::Logger->new );
 
 __PACKAGE__->setup( qw(I18N LanguagePrefix) );
 
