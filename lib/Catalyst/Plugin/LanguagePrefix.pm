@@ -230,7 +230,7 @@ sub prepare_path_prefix
       my $req_base = $c->req->base;
       $req_base->path($req_base->path . $language_code . '/');
 
-      $c->_language_prefix_debug("set language prefix to '$language_code' ");
+      $c->_language_prefix_debug("set language prefix to '$language_code'");
     }
   }
   else {
