@@ -203,6 +203,15 @@ sub prepare_path_prefix
 
       # set the path to the remaining path after stripping the language code prefix
       $c->req->path($path);
+
+      # append the language code to the base
+      my $req_base = $c->req->base;
+      $req_base->path($req_base->path . $language_code . '/');
+
+      # it seems that Catalyst::Request is quirky - we have to explicitly set
+      # $c->req->uri (because setting $c->req->path sets $c->req->uri->path
+      # implicitly)
+      $c->req->uri($c->req->base . $c->req->path);
     }
     else {
       my $detected_language_code =
@@ -215,12 +224,14 @@ sub prepare_path_prefix
 
       # fake that the request path already contained the language code prefix
       $c->req->uri->path($language_code . '/' . $c->req->path);
+      $c->req->path($language_code . '/' . $c->req->path);
+
+      # append the language code to the base
+      my $req_base = $c->req->base;
+      $req_base->path($req_base->path . $language_code . '/');
 
       $c->_language_prefix_debug("set language prefix to '$language_code' ");
     }
-
-    my $req_base = $c->req->base;
-    $req_base->path($req_base->path . $language_code . '/');
   }
   else {
     $c->_language_prefix_debug("path '" . $c->req->path . "' is language independent");
