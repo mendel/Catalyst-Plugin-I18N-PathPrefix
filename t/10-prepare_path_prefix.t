@@ -14,6 +14,11 @@ use Catalyst::Test 'TestApp';
 use Data::Dumper;
 
 #TODO whether it's cleaner to monkey-patch $c->_language_prefix_debug instead of subclassing Catalyst::Log and filtering on the message prefix?
+#FIXME test for debug => 0
+#FIXME test $c->uri_in_language_for
+#FIXME test $c->switch_language
+#FIXME test $c->language_switch_options
+#FIXME test language switch template (when written)
 
 # Each element is a hashref, with the following key-value pairs:
 #   path: The path part of the URI to request.
