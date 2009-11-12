@@ -1,12 +1,11 @@
 package TestApp;
 
-use strict;
-use warnings;
+use Moose;
+use namespace::autoclean;
 
-use Catalyst::Runtime 5.80;
+extends 'Catalyst';
+
 use TestApp::Logger;
-
-use parent qw(Catalyst);
 
 our $VERSION = '0.01';
 
