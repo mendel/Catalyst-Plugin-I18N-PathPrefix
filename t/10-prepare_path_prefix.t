@@ -13,19 +13,20 @@ use HTTP::Request::Common;
 use Catalyst::Test 'TestApp';
 use Data::Dumper;
 
-#FIXME test for debug => 0
 #FIXME test $c->uri_in_language_for
 #FIXME test $c->switch_language
 #FIXME test $c->language_switch_options
 #FIXME test language switch template (when written)
 
 # Each element is a hashref, with the following key-value pairs:
-#   path: The path part of the URI to request.
-#   accept_language: An arrayref, contains language codes to set the
-#     Accept-Language request header to before the request.
-#   fallback_language: The language code to set
-#     $c->config->{'Plugin::LanguagePrefix'}->{fallback_language} to before
-#     the request.
+#   config: An arrayref that describes the configuration of the module. The
+#     corresponding key-value pairs of $c->config->{'Plugin::LanguagePrefix'} are
+#     set to these values before the request.
+#   request: An arrayref that describes the request. It can contain the
+#     following key-value pairs:
+#       path: The path part of the URI to request.
+#       accept_language: An arrayref, contains language codes to set the
+#         Accept-Language request header to before the request.
 #   expected: A hashref that contains the expected values after the request.
 #     It contains following key-value pairs:
 #       language: The expected value of $c->language.
@@ -42,9 +43,13 @@ use Data::Dumper;
 #         value is the message.
 my @tests = (
   {
-    path => '/language_independent_stuff',
-    accept_language => ['de'],
-    fallback_language => 'en',
+    config => {
+      fallback_language => 'en',
+    },
+    request => {
+      path => '/language_independent_stuff',
+      accept_language => ['de'],
+    },
     expected => {
       language => 'en',
       req => {
@@ -62,9 +67,13 @@ my @tests = (
   },
 
   {
-    path => '/fr',
-    accept_language => ['de'],
-    fallback_language => 'en',
+    config => {
+      fallback_language => 'en',
+    },
+    request => {
+      path => '/fr',
+      accept_language => ['de'],
+    },
     expected => {
       language => 'fr',
       req => {
@@ -79,9 +88,13 @@ my @tests = (
     },
   },
   {
-    path => '/fr/',
-    accept_language => ['de'],
-    fallback_language => 'en',
+    config => {
+      fallback_language => 'en',
+    },
+    request => {
+      path => '/fr/',
+      accept_language => ['de'],
+    },
     expected => {
       language => 'fr',
       req => {
@@ -96,9 +109,13 @@ my @tests = (
     },
   },
   {
-    path => '/fr/foo/bar',
-    accept_language => ['de'],
-    fallback_language => 'en',
+    config => {
+      fallback_language => 'en',
+    },
+    request => {
+      path => '/fr/foo/bar',
+      accept_language => ['de'],
+    },
     expected => {
       language => 'fr',
       req => {
@@ -114,9 +131,13 @@ my @tests = (
   },
 
   {
-    path => '/hu/foo/bar',
-    accept_language => ['de'],
-    fallback_language => 'en',
+    config => {
+      fallback_language => 'en',
+    },
+    request => {
+      path => '/hu/foo/bar',
+      accept_language => ['de'],
+    },
     expected => {
       language => 'de',
       req => {
@@ -133,9 +154,13 @@ my @tests = (
   },
 
   {
-    path => '/foo/bar',
-    accept_language => ['de'],
-    fallback_language => 'en',
+    config => {
+      fallback_language => 'en',
+    },
+    request => {
+      path => '/foo/bar',
+      accept_language => ['de'],
+    },
     expected => {
       language => 'de',
       req => {
@@ -151,9 +176,13 @@ my @tests = (
     },
   },
   {
-    path => '/foo/bar',
-    accept_language => [],
-    fallback_language => 'en',
+    config => {
+      fallback_language => 'en',
+    },
+    request => {
+      path => '/foo/bar',
+      accept_language => [],
+    },
     expected => {
       language => 'en',
       req => {
@@ -170,9 +199,13 @@ my @tests = (
   },
 
   {
-    path => '/language_independent_stuff',
-    accept_language => ['de'],
-    fallback_language => 'fr',
+    config => {
+      fallback_language => 'fr',
+    },
+    request => {
+      path => '/language_independent_stuff',
+      accept_language => ['de'],
+    },
     expected => {
       language => 'fr',
       req => {
@@ -190,9 +223,13 @@ my @tests = (
   },
 
   {
-    path => '/foo/bar',
-    accept_language => [],
-    fallback_language => 'fr',
+    config => {
+      fallback_language => 'fr',
+    },
+    request => {
+      path => '/foo/bar',
+      accept_language => [],
+    },
     expected => {
       language => 'fr',
       req => {
@@ -216,16 +253,18 @@ my @tests = (
         +{
           map {
             ( $_ => $test->{$_} )
-          } qw(path accept_language fallback_language)
+          } qw(config request)
         }
       ])->Terse(1)->Indent(0)->Quotekeys(0)->Dump;
 
-    TestApp->config->{'Plugin::LanguagePrefix'}->{fallback_language}
-      = $test->{fallback_language} if exists $test->{fallback_language};
+    while (my ($config_key, $config_value) = each %{ $test->{config} }) {
+      TestApp->config->{'Plugin::LanguagePrefix'}->{$config_key}
+        = $config_value;
+    }
 
     my ($response, $c) = ctx_request(
-      GET $test->{path},
-        'Accept-Language' => $test->{accept_language},
+      GET $test->{request}->{path},
+        'Accept-Language' => $test->{request}->{accept_language},
     );
 
     ok(
