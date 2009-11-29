@@ -45,4 +45,6 @@ before _language_prefix_debug => sub {
   $self->append_to_language_prefix_debug_messages(debug => $msg);
 };
 
+__PACKAGE__->meta->make_immutable;
+
 1;
