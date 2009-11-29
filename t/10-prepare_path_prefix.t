@@ -226,6 +226,8 @@ my @tests = (
 );
 
 {
+  my %original_config = %{ TestApp->config->{'Plugin::LanguagePrefix'} };
+
   foreach my $test (@tests) {
     my $test_description =
       Data::Dumper->new([
@@ -236,6 +238,7 @@ my @tests = (
         }
       ])->Terse(1)->Indent(0)->Quotekeys(0)->Dump;
 
+    TestApp->config->{'Plugin::LanguagePrefix'} = { %original_config };
     while (my ($config_key, $config_value) = each %{ $test->{config} }) {
       TestApp->config->{'Plugin::LanguagePrefix'}->{$config_key}
         = $config_value;
