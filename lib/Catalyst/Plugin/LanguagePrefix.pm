@@ -403,7 +403,8 @@ sub _set_language_prefix
 {
   my ($c, $language_code) = (shift, @_);
 
-  if ($c->req->path !~ $c->config->{language_independent_paths}) {
+  if ($c->req->path !~
+      $c->config->{'Plugin::LanguagePrefix'}->{language_independent_paths}) {
     my ($actual_base) = $c->req->base->path =~ m{^(.*)/[^/]+/?$};
 
     $c->req->base->path($actual_base . '/' . $language_code);
