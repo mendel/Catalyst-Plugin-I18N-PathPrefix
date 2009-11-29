@@ -43,9 +43,6 @@ use Data::Dumper;
 #         value is the message.
 my @tests = (
   {
-    config => {
-      fallback_language => 'en',
-    },
     request => {
       path => '/language_independent_stuff',
       accept_language => ['de'],
@@ -67,9 +64,6 @@ my @tests = (
   },
 
   {
-    config => {
-      fallback_language => 'en',
-    },
     request => {
       path => '/fr',
       accept_language => ['de'],
@@ -88,9 +82,6 @@ my @tests = (
     },
   },
   {
-    config => {
-      fallback_language => 'en',
-    },
     request => {
       path => '/fr/',
       accept_language => ['de'],
@@ -109,9 +100,6 @@ my @tests = (
     },
   },
   {
-    config => {
-      fallback_language => 'en',
-    },
     request => {
       path => '/fr/foo/bar',
       accept_language => ['de'],
@@ -131,9 +119,6 @@ my @tests = (
   },
 
   {
-    config => {
-      fallback_language => 'en',
-    },
     request => {
       path => '/hu/foo/bar',
       accept_language => ['de'],
@@ -154,9 +139,6 @@ my @tests = (
   },
 
   {
-    config => {
-      fallback_language => 'en',
-    },
     request => {
       path => '/foo/bar',
       accept_language => ['de'],
@@ -176,9 +158,6 @@ my @tests = (
     },
   },
   {
-    config => {
-      fallback_language => 'en',
-    },
     request => {
       path => '/foo/bar',
       accept_language => [],
