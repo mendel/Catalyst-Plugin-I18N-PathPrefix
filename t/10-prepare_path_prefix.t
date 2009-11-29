@@ -251,11 +251,15 @@ my @tests = (
       "\$c->req->uri is set to the expected value ($test_description)"
     );
 
+    isa_ok($c->req->uri, 'URI', "\$c->req->uri ($test_description)");
+
     is(
       $c->req->base,
       $test->{expected}->{req}->{base},
       "\$c->req->base is set to the expected value ($test_description)"
     );
+
+    isa_ok($c->req->base, 'URI', "\$c->req->base ($test_description)");
 
     is(
       $c->req->path,

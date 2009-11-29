@@ -217,7 +217,7 @@ sub prepare_path_prefix
       # it seems that Catalyst::Request is quirky - we have to explicitly set
       # $c->req->uri (because setting $c->req->path sets $c->req->uri->path
       # implicitly)
-      $c->req->uri($c->req->base . $c->req->path);
+      $c->req->uri(URI->new($c->req->base . $c->req->path));
     }
     else {
       my $detected_language_code =
