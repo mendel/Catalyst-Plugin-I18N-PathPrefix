@@ -193,13 +193,14 @@ sub prepare_path_prefix
 
   # fill the hash for quick lookups if not done yet
   if (!%valid_language_codes) {
-    @valid_language_codes{ @{ $config->{valid_languages} } } = ();
+    @valid_language_codes{ map { lc $_ } @{ $config->{valid_languages} } } = ();
   }
 
-  my $language_code = $config->{fallback_language};
+  my $language_code = lc $config->{fallback_language};
 
   if ($c->req->path !~ $config->{language_independent_paths}) {
     my ($prefix, $path) = split m{/}, $c->req->path, 2;
+    $prefix = lc $prefix;
 
     if (defined $prefix && exists $valid_language_codes{$prefix}) {
       $language_code = $prefix;
@@ -221,7 +222,9 @@ sub prepare_path_prefix
     }
     else {
       my $detected_language_code =
-        first { exists $valid_language_codes{$_} } @{ $c->languages };
+        first { exists $valid_language_codes{$_} }
+          map { lc $_ }
+            @{ $c->languages };
 
       $c->_language_prefix_debug("detected language: "
         . ($detected_language_code ? "'$detected_language_code'" : "N/A"));
@@ -273,6 +276,8 @@ sub set_languages_from_language_prefix
 {
   my ($c, $language_code) = (shift, @_);
 
+  $language_code = lc $language_code;
+
   $c->languages([$language_code]);
 }
 
@@ -301,6 +306,8 @@ sub uri_in_language_for
 {
   my ($c, $language_code, @uri_for_args) = (shift, @_);
 
+  $language_code = lc $language_code;
+
   my $scope_guard = $c->_set_language_prefix_temporarily($language_code);
 
   return $c->uri_for(@uri_for_args);
@@ -324,6 +331,8 @@ from a request parameter, from the session or from the user object).
 sub switch_language
 {
   my ($c, $language_code) = (shift, @_);
+
+  $language_code = lc $language_code;
 
   $c->_set_language_prefix($language_code);
 

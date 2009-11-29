@@ -62,6 +62,29 @@ my @tests = (
       ],
     },
   },
+  {
+    config => {
+      fallback_language => 'FR',
+    },
+    request => {
+      path => '/language_independent_stuff',
+      accept_language => ['de'],
+    },
+    expected => {
+      language => 'fr',
+      req => {
+        uri => 'http://localhost/language_independent_stuff',
+        base => 'http://localhost/',
+        path => 'language_independent_stuff',
+      },
+      action => 'TestApp::Controller::Root::language_independent_stuff',
+      log => [
+        debug =>
+          'path \'language_independent_stuff\' '
+            . 'is language independent',
+      ],
+    },
+  },
 
   {
     request => {
@@ -114,6 +137,42 @@ my @tests = (
       action => 'TestApp::Controller::Foo::bar',
       log => [
         debug => 'found language prefix \'fr\' in path \'fr/foo/bar\'',
+      ],
+    },
+  },
+  {
+    request => {
+      path => '/FR/foo/bar',
+      accept_language => ['de'],
+    },
+    expected => {
+      language => 'fr',
+      req => {
+        uri => 'http://localhost/fr/foo/bar',
+        base => 'http://localhost/fr/',
+        path => 'foo/bar',
+      },
+      action => 'TestApp::Controller::Foo::bar',
+      log => [
+        debug => 'found language prefix \'fr\' in path \'FR/foo/bar\'',
+      ],
+    },
+  },
+  {
+    request => {
+      path => '/it/foo/bar',
+      accept_language => ['de'],
+    },
+    expected => {
+      language => 'it',
+      req => {
+        uri => 'http://localhost/it/foo/bar',
+        base => 'http://localhost/it/',
+        path => 'foo/bar',
+      },
+      action => 'TestApp::Controller::Foo::bar',
+      log => [
+        debug => 'found language prefix \'it\' in path \'it/foo/bar\'',
       ],
     },
   },

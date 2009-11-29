@@ -10,7 +10,7 @@ our $VERSION = '0.01';
 __PACKAGE__->config(
   name => 'TestApp',
   'Plugin::LanguagePrefix' => {
-    valid_languages => ['en', 'de', 'fr'],
+    valid_languages => ['en', 'de', 'fr', 'IT'],
     fallback_language => 'en',
     language_independent_paths => qr{
       ^ language_independent_stuff
