@@ -13,7 +13,6 @@ use HTTP::Request::Common;
 use Catalyst::Test 'TestApp';
 use Data::Dumper;
 
-#TODO whether it's cleaner to monkey-patch $c->_language_prefix_debug instead of subclassing Catalyst::Log and filtering on the message prefix?
 #FIXME test for debug => 0
 #FIXME test $c->uri_in_language_for
 #FIXME test $c->switch_language
@@ -56,7 +55,7 @@ my @tests = (
       action => 'TestApp::Controller::Root::language_independent_stuff',
       log => [
         debug =>
-          'LanguagePrefix: path \'language_independent_stuff\' '
+          'path \'language_independent_stuff\' '
             . 'is language independent',
       ],
     },
@@ -75,7 +74,7 @@ my @tests = (
       },
       action => 'TestApp::Controller::Root::index',
       log => [
-        debug => 'LanguagePrefix: found language prefix \'fr\' in path \'fr\'',
+        debug => 'found language prefix \'fr\' in path \'fr\'',
       ],
     },
   },
@@ -92,7 +91,7 @@ my @tests = (
       },
       action => 'TestApp::Controller::Root::index',
       log => [
-        debug => 'LanguagePrefix: found language prefix \'fr\' in path \'fr/\'',
+        debug => 'found language prefix \'fr\' in path \'fr/\'',
       ],
     },
   },
@@ -109,7 +108,7 @@ my @tests = (
       },
       action => 'TestApp::Controller::Foo::bar',
       log => [
-        debug => 'LanguagePrefix: found language prefix \'fr\' in path \'fr/foo/bar\'',
+        debug => 'found language prefix \'fr\' in path \'fr/foo/bar\'',
       ],
     },
   },
@@ -127,8 +126,8 @@ my @tests = (
       },
       action => 'TestApp::Controller::Root::default',
       log => [
-        debug => 'LanguagePrefix: detected language: \'de\'',
-        debug => 'LanguagePrefix: set language prefix to \'de\'',
+        debug => 'detected language: \'de\'',
+        debug => 'set language prefix to \'de\'',
       ],
     },
   },
@@ -146,8 +145,8 @@ my @tests = (
       },
       action => 'TestApp::Controller::Foo::bar',
       log => [
-        debug => 'LanguagePrefix: detected language: \'de\'',
-        debug => 'LanguagePrefix: set language prefix to \'de\'',
+        debug => 'detected language: \'de\'',
+        debug => 'set language prefix to \'de\'',
       ],
     },
   },
@@ -164,8 +163,8 @@ my @tests = (
       },
       action => 'TestApp::Controller::Foo::bar',
       log => [
-        debug => 'LanguagePrefix: detected language: N/A',
-        debug => 'LanguagePrefix: set language prefix to \'en\'',
+        debug => 'detected language: N/A',
+        debug => 'set language prefix to \'en\'',
       ],
     },
   },
@@ -184,7 +183,7 @@ my @tests = (
       action => 'TestApp::Controller::Root::language_independent_stuff',
       log => [
         debug =>
-          'LanguagePrefix: path \'language_independent_stuff\' '
+          'path \'language_independent_stuff\' '
             . 'is language independent',
       ],
     },
@@ -203,8 +202,8 @@ my @tests = (
       },
       action => 'TestApp::Controller::Foo::bar',
       log => [
-        debug => 'LanguagePrefix: detected language: N/A',
-        debug => 'LanguagePrefix: set language prefix to \'fr\'',
+        debug => 'detected language: N/A',
+        debug => 'set language prefix to \'fr\'',
       ],
     },
   },
@@ -223,8 +222,6 @@ my @tests = (
 
     TestApp->config->{'Plugin::LanguagePrefix'}->{fallback_language}
       = $test->{fallback_language} if exists $test->{fallback_language};
-
-    TestApp->log->clear_languageprefix_plugin_log;
 
     my ($response, $c) = ctx_request(
       GET $test->{path},
@@ -267,7 +264,7 @@ my @tests = (
     );
 
     eq_or_diff(
-      $c->log->languageprefix_plugin_log,
+      $c->language_prefix_debug_messages,
       $test->{expected}->{log},
       "The plugin logged only the expected messages during the request "
         . "($test_description)"

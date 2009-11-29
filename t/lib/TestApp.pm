@@ -5,8 +5,6 @@ use namespace::autoclean;
 
 extends 'Catalyst';
 
-use TestApp::Logger;
-
 our $VERSION = '0.01';
 
 __PACKAGE__->config(
@@ -17,12 +15,34 @@ __PACKAGE__->config(
     language_independent_paths => qr{
       ^ language_independent_stuff
     }x,
-    debug => 1,
   },
 );
 
-__PACKAGE__->log( TestApp::Logger->new );
-
 __PACKAGE__->setup( qw(I18N LanguagePrefix) );
+
+has language_prefix_debug_messages => (
+  isa => 'ArrayRef[Str]',
+  traits => ['Array'],
+  is => 'ro',
+  default => sub { [] },
+  handles => {
+    clear_language_prefix_debug_messages => 'clear',
+    append_to_language_prefix_debug_messages => 'push',
+  },
+  documentation =>
+    'The messages logged by the C:P::LanguagePrefix module.',
+);
+
+before prepare_request => sub {
+  my ($self) = @_;
+
+  $self->clear_language_prefix_debug_messages;
+};
+
+before _language_prefix_debug => sub {
+  my ($self, $msg) = @_;
+
+  $self->append_to_language_prefix_debug_messages(debug => $msg);
+};
 
 1;
