@@ -295,6 +295,10 @@ Internally this method temporarily sets the paths in C<< $c->req >>, calls
 L<Catalyst/uri_for> then resets the paths. Ineffective, but you usually call it
 very infrequently.
 
+Note: You should not call this method to generate language-independent paths,
+as it will generate invalid URLs currently (ie. the language independent path
+prefixed with the language prefix).
+
 Note: This module intentionally does not override L<Catalyst/uri_for> but
 provides this method instead: L<Catalyst/uri_for> is usually called many times
 per request, and most of the cases you want it to use the current language; not

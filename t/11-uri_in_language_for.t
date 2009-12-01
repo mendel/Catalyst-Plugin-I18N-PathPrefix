@@ -18,16 +18,22 @@ use Data::Dumper;
 #   expected_uri: String, the expected URI.
 my @tests = (
   {
-    args => [ en => 'foo/bar' ],
+    args => [ en => '/foo/bar' ],
     expected_uri => 'http://localhost/en/foo/bar',
   },
   {
-    args => [ EN => 'foo/bar' ],
+    args => [ EN => '/foo/bar' ],
     expected_uri => 'http://localhost/en/foo/bar',
   },
   {
-    args => [ de => 'foo/bar' ],
+    args => [ de => '/foo/bar' ],
     expected_uri => 'http://localhost/de/foo/bar',
+  },
+  {
+    args => [ de => '/language_independent_stuff' ],
+    expected_uri => 'http://localhost/language_independent_stuff',
+    todo => '$c->uri_in_language_for() currently does not work for '
+      . 'language independent paths.',
   },
 );
 
@@ -49,11 +55,15 @@ my @tests = (
         }
       ])->Terse(1)->Indent(0)->Quotekeys(0)->Dump;
 
+    local $TODO = $test->{todo};
+
     is(
       $c->uri_in_language_for(@{ $test->{args} }),
       $test->{expected_uri},
       "\$c->uri_in_language_for() returns the expected URI ($test_description)"
     );
+
+    #FIXME test that $c->uri_for() still uses the original language
   }
 }
 
