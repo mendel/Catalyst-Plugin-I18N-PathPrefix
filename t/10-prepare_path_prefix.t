@@ -60,6 +60,28 @@ my @tests = (
     },
   },
   {
+    request => {
+      path => '/it/language_independent_stuff',
+    },
+    expected => {
+      language => 'en',
+      req => {
+        uri => 'http://localhost/language_independent_stuff',
+        base => 'http://localhost/',
+        path => 'language_independent_stuff',
+      },
+      action => 'TestApp::Controller::Root::language_independent_stuff',
+      log => [
+        debug =>
+          'found language prefix \'it\' in path '
+            . '\'it/language_independent_stuff\'',
+        debug =>
+          'path \'language_independent_stuff\' '
+            . 'is language independent',
+      ],
+    },
+  },
+  {
     config => {
       fallback_language => 'FR',
     },

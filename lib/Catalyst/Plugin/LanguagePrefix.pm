@@ -112,8 +112,9 @@ L</valid_languages>.
 =head2 language_independent_paths => $regex
 
 If the URI path is matched by C<$regex>, do not add language prefix and ignore
-if there's one (and pretend if the URI did not contain any language prefix, ie.
-rewrite C<< $c->req->uri >>, C<< $c->req->base >> and C<< $c->req->path >>).
+if there's one (and pretend as if the URI did not contain any language prefix,
+ie.  rewrite C<< $c->req->uri >>, C<< $c->req->base >> and C<< $c->req->path >>
+to remove the prefix from them).
 
 Use a regex that matches all your paths that return language independent
 information.
@@ -212,9 +213,17 @@ sub prepare_path_prefix
       # set the path to the remaining path after stripping the language code prefix
       $c->req->path($path);
 
-      # append the language code to the base
-      my $req_base = $c->req->base;
-      $req_base->path($req_base->path . $language_code . '/');
+      # can be a language independent path with surplus language prefix
+      if (!defined $path || $path !~ $config->{language_independent_paths}) {
+        # append the language code to the base
+        my $req_base = $c->req->base;
+        $req_base->path($req_base->path . $language_code . '/');
+      }
+      else {
+        $c->_language_prefix_debug("path '" . $c->req->path . "' is language independent");
+
+        $language_code = lc $config->{fallback_language};
+      }
 
       # it seems that Catalyst::Request is quirky - we have to explicitly set
       # $c->req->uri (because setting $c->req->path sets $c->req->uri->path
