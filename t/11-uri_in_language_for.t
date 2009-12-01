@@ -18,6 +18,11 @@ use Data::Dumper;
 #   expected_uri: String, the expected URI.
 my @tests = (
   {
+    args => [ en => '/' ],
+    expected_uri => 'http://localhost/en/',
+  },
+
+  {
     args => [ en => '/foo/bar' ],
     expected_uri => 'http://localhost/en/foo/bar',
   },
@@ -25,10 +30,12 @@ my @tests = (
     args => [ EN => '/foo/bar' ],
     expected_uri => 'http://localhost/en/foo/bar',
   },
+
   {
     args => [ de => '/foo/bar' ],
     expected_uri => 'http://localhost/de/foo/bar',
   },
+
   {
     args => [ de => '/language_independent_stuff' ],
     expected_uri => 'http://localhost/language_independent_stuff',
