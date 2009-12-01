@@ -13,8 +13,6 @@ use HTTP::Request::Common;
 use Catalyst::Test 'TestApp';
 use Data::Dumper;
 
-#FIXME test language switch template (when written)
-
 # Each element is a hashref, with the following key-value pairs:
 #   config: An arrayref that describes the configuration of the module. The
 #     corresponding key-value pairs of $c->config->{'Plugin::LanguagePrefix'} are
