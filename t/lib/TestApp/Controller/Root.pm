@@ -1,9 +1,10 @@
 package TestApp::Controller::Root;
 
-use strict;
-use warnings;
+use Moose;
 
-use parent qw(Catalyst::Controller);
+BEGIN {
+  extends 'Catalyst::Controller';
+};
 
 __PACKAGE__->config->{'namespace'} = '';
 
@@ -13,5 +14,7 @@ sub default :Path { }
 
 sub language_independent_stuff :Local { }
 
+
+__PACKAGE__->meta->make_immutable;
 
 1;

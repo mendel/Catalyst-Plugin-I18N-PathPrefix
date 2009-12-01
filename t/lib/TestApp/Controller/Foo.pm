@@ -1,11 +1,14 @@
 package TestApp::Controller::Foo;
 
-use strict;
-use warnings;
+use Moose;
 
-use parent qw(Catalyst::Controller);
+BEGIN {
+  extends 'Catalyst::Controller';
+}
 
 sub bar :Local { }
 
+
+__PACKAGE__->meta->make_immutable;
 
 1;
