@@ -13,7 +13,6 @@ use HTTP::Request::Common;
 use Catalyst::Test 'TestApp';
 use Data::Dumper;
 
-#FIXME test $c->language_switch_options
 #FIXME test language switch template (when written)
 
 # Each element is a hashref, with the following key-value pairs:

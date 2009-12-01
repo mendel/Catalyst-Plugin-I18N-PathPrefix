@@ -11,6 +11,7 @@ requires
 
 use List::Util qw(first);
 use Scope::Guard;
+use I18N::LangTags::List;
 
 =head1 NAME
 
@@ -385,9 +386,10 @@ sub language_switch_options
     map {
       $_ => {
         name => $c->loc(I18N::LangTags::List::name($_)),
-        uri => $c->uri_in_language_for($_ => $c->req->uri),
+        uri => $c->uri_in_language_for($_ => '/' . $c->req->path),
       }
-    } @{ $c->config->{'Plugin::LanguagePrefix'}->{valid_languages} }
+    } map { lc $_ }
+      @{ $c->config->{'Plugin::LanguagePrefix'}->{valid_languages} }
   };
 }
 
@@ -476,6 +478,8 @@ Norbert Buchmüller, C<< <norbi at nix.hu> >>
 =head1 TODO
 
 =over
+
+=item make L</uri_in_language_for> work on language-independent URIs
 
 =item support locales instead of language codes
 

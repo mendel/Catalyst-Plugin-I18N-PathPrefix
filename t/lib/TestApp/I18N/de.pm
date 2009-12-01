@@ -5,6 +5,11 @@ use warnings;
 
 use base 'TestApp::I18N';
 
-our %Lexicon;
+our %Lexicon = (
+  'English' => 'Englisch',
+  'German'  => 'Deutsch',
+  'French'  => 'Franzäsisch',
+  'Italian' => 'Italienisch',
+);
 
 1;
