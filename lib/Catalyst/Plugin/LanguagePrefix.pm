@@ -409,12 +409,12 @@ sub _set_language_prefix
 
   if ($c->req->path !~
       $c->config->{'Plugin::LanguagePrefix'}->{language_independent_paths}) {
-    my ($actual_base) = $c->req->base->path =~ m{^(.*)/[^/]+/?$};
+    my ($actual_base_path) = $c->req->base->path =~ m{ ^ / [^/]+ (.*) $ }x;
 
-    $c->req->base->path($actual_base . '/' . $language_code);
+    $c->req->base->path($language_code . $actual_base_path);
 
-    my @uri_path_chunks = split m{/}, $c->req->uri->path, 2;
-    $c->req->uri->path($language_code . '/' . $uri_path_chunks[1]);
+    my ($actual_uri_path) = $c->req->uri->path =~ m{ ^ / [^/]+ (.*) $ }x;
+    $c->req->uri->path($language_code . $actual_uri_path);
   }
 }
 
