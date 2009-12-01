@@ -57,13 +57,20 @@ my @tests = (
 
     local $TODO = $test->{todo};
 
+    my $uri_for_result_before = $c->uri_for(@{ $test->{args} }[ 1 .. $#{ $test->{args} } ]);
+
     is(
       $c->uri_in_language_for(@{ $test->{args} }),
       $test->{expected_uri},
       "\$c->uri_in_language_for() returns the expected URI ($test_description)"
     );
 
-    #FIXME test that $c->uri_for() still uses the original language
+    is(
+      $c->uri_for(@{ $test->{args} }[ 1 .. $#{ $test->{args} } ]),
+      $uri_for_result_before,
+      "\$c->uri_for() returns the same URI as before calling "
+        . "\$c->uri_in_language_for() ($test_description)"
+    );
   }
 }
 
