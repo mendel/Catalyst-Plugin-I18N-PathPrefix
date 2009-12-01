@@ -480,6 +480,9 @@ sub _language_prefix_debug
 }
 
 
+=head1 SEE ALSO
+
+L<http://search.cpan.org/perldoc?Catalyst::Plugin::I18N>, L<http://search.cpan.org/perldoc?Catalyst::TraitFor::Request::PerLanguageDomains>
 
 =head1 AUTHOR
 
