@@ -9,6 +9,7 @@ use Module::Install::AuthorRequires 0.02;
 use Module::Install::ReadmeFromPod 0.06;
 use Module::Install::Repository 0.06;
 use Module::Install::ExtraTests 0.006;
+use Module::Install::Share 0.91;
 
 name 'Catalyst-Plugin-LanguagePrefix';
 all_from 'lib/Catalyst/Plugin/LanguagePrefix.pm';
@@ -46,5 +47,7 @@ author_requires 'Pod::Coverage' => '0.18';
 extra_tests;
 
 auto_install;
+
+install_share;
 
 WriteAll;

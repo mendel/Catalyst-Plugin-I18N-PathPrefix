@@ -383,7 +383,8 @@ language prefix replaced).
 
 =back
 
-TODO include example TT2 template for the language switch
+You can find an example TT2 HTML template for the language switch included in
+the distribution.
 
 =cut
 
