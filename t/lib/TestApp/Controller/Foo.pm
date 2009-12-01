@@ -5,12 +5,7 @@ use warnings;
 
 use parent qw(Catalyst::Controller);
 
-sub bar :Local
-{
-  my ($self, $c) = (shift, shift, @_);
-
-
-}
+sub bar :Local { }
 
 
 1;
