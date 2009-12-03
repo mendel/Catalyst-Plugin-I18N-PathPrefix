@@ -15,8 +15,8 @@ use Data::Dumper;
 
 # Each element is a hashref, with the following key-value pairs:
 #   config: An arrayref that describes the configuration of the module. The
-#     corresponding key-value pairs of $c->config->{'Plugin::LanguagePrefix'} are
-#     set to these values before the request.
+#     corresponding key-value pairs of $c->config->{'Plugin::I18N::PathPrefix'}
+#     are set to these values before the request.
 #   request: An arrayref that describes the request. It can contain the
 #     following key-value pairs:
 #       path: The path part of the URI to request.
@@ -302,7 +302,7 @@ my @tests = (
 );
 
 {
-  my %original_config = %{ TestApp->config->{'Plugin::LanguagePrefix'} };
+  my %original_config = %{ TestApp->config->{'Plugin::I18N::PathPrefix'} };
 
   foreach my $test (@tests) {
     my $test_description =
@@ -314,9 +314,9 @@ my @tests = (
         }
       ])->Terse(1)->Indent(0)->Quotekeys(0)->Dump;
 
-    TestApp->config->{'Plugin::LanguagePrefix'} = { %original_config };
+    TestApp->config->{'Plugin::I18N::PathPrefix'} = { %original_config };
     while (my ($config_key, $config_value) = each %{ $test->{config} }) {
-      TestApp->config->{'Plugin::LanguagePrefix'}->{$config_key}
+      TestApp->config->{'Plugin::I18N::PathPrefix'}->{$config_key}
         = $config_value;
     }
 

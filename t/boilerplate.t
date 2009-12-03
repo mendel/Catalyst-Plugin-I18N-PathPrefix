@@ -48,7 +48,7 @@ TODO: {
     "placeholder date/time"       => qr(Date/time)
   );
 
-  module_boilerplate_ok('lib/Catalyst/Plugin/LanguagePrefix.pm');
+  module_boilerplate_ok('lib/Catalyst/Plugin/I18N/PathPrefix.pm');
 
 
 }

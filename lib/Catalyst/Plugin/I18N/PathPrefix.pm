@@ -1,4 +1,4 @@
-package Catalyst::Plugin::LanguagePrefix;
+package Catalyst::Plugin::I18N::PathPrefix;
 
 use 5.008;
 
@@ -17,7 +17,7 @@ use I18N::LangTags::List;
 
 =head1 NAME
 
-Catalyst::Plugin::LanguagePrefix - Language prefix in the request path
+Catalyst::Plugin::I18N::PathPrefix - Language prefix in the request path
 
 =head1 VERSION
 
@@ -32,9 +32,9 @@ our $VERSION = '0.01';
 
   # in MyApp.pm
   use Catalyst;
-  MyApp->setup( qw/I18N LanguagePrefix/ );
+  MyApp->setup( qw/I18N I18N::PathPrefix/ );
 
-  MyApp->config->{'Plugin::LanguagePrefix'} => {
+  MyApp->config->{'Plugin::I18N::PathPrefix'} => {
     valid_languages => ['en', 'de', 'fr'],
     fallback_language => 'en',
     language_independent_paths => qr{
@@ -97,7 +97,7 @@ resort to putting the language selector into the URL.
 
 =head1 CONFIGURATION
 
-You can use these configuration options under the C<'Plugin::LanguagePrefix'>
+You can use these configuration options under the C<'Plugin::I18N::PathPrefix'>
 key:
 
 =head2 valid_languages
@@ -201,7 +201,7 @@ sub prepare_path_prefix
 {
   my ($c) = (shift, @_);
 
-  my $config = $c->config->{'Plugin::LanguagePrefix'};
+  my $config = $c->config->{'Plugin::I18N::PathPrefix'};
 
   # fill the hash for quick lookups if not done yet
   if (!%valid_language_codes) {
@@ -409,7 +409,7 @@ sub language_switch_options
         uri => $c->uri_for_in_language($_ => '/' . $c->req->path),
       }
     } map { lc $_ }
-      @{ $c->config->{'Plugin::LanguagePrefix'}->{valid_languages} }
+      @{ $c->config->{'Plugin::I18N::PathPrefix'}->{valid_languages} }
   };
 }
 
@@ -430,7 +430,7 @@ sub _set_language_prefix
   my ($c, $language_code) = (shift, @_);
 
   if ($c->req->path !~
-      $c->config->{'Plugin::LanguagePrefix'}->{language_independent_paths}) {
+      $c->config->{'Plugin::I18N::PathPrefix'}->{language_independent_paths}) {
     my ($actual_base_path) = $c->req->base->path =~ m{ ^ / [^/]+ (.*) $ }x;
 
     $c->req->base->path($language_code . $actual_base_path);
@@ -474,7 +474,7 @@ sub _set_language_prefix_temporarily
 
   $c->_language_prefix_debug($message)
 
-Logs C<$message> using C<< $c->log->debug("LanguagePrefix: $message") >> if the
+Logs C<$message> using C<< $c->log->debug("Plugin::I18N::PathPrefix: $message") >> if the
 L</debug> config option is true.
 
 =end internal
@@ -485,8 +485,8 @@ sub _language_prefix_debug
 {
   my ($c, $message) = (shift, @_);
 
-  $c->log->debug("LanguagePrefix: $message")
-    if $c->config->{'Plugin::LanguagePrefix'}->{debug};
+  $c->log->debug("Plugin::I18N::PathPrefix: $message")
+    if $c->config->{'Plugin::I18N::PathPrefix'}->{debug};
 }
 
 
@@ -511,9 +511,9 @@ Norbert Buchmüller, C<< <norbi at nix.hu> >>
 =head1 BUGS
 
 Please report any bugs or feature requests to
-C<bug-catalyst-plugin-languageprefix at rt.cpan.org>, or through the web
+C<bug-catalyst-plugin-i18n-pathprefix at rt.cpan.org>, or through the web
 interface at
-L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Catalyst-Plugin-LanguagePrefix>.
+L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Catalyst-Plugin-I18N-PathPrefix>.
 I will be notified, and then you'll automatically be notified of progress on
 your bug as I make changes.
 
@@ -521,7 +521,7 @@ your bug as I make changes.
 
 You can find documentation for this module with the perldoc command.
 
-    perldoc Catalyst::Plugin::LanguagePrefix
+    perldoc Catalyst::Plugin::I18N::PathPrefix
 
 You can also look for information at:
 
@@ -529,19 +529,19 @@ You can also look for information at:
 
 =item * RT: CPAN's request tracker
 
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Catalyst-Plugin-LanguagePrefix>
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Catalyst-Plugin-I18N-PathPrefix>
 
 =item * AnnoCPAN: Annotated CPAN documentation
 
-L<http://annocpan.org/dist/Catalyst-Plugin-LanguagePrefix>
+L<http://annocpan.org/dist/Catalyst-Plugin-I18N-PathPrefix>
 
 =item * CPAN Ratings
 
-L<http://cpanratings.perl.org/d/Catalyst-Plugin-LanguagePrefix>
+L<http://cpanratings.perl.org/d/Catalyst-Plugin-I18N-PathPrefix>
 
 =item * Search CPAN
 
-L<http://search.cpan.org/dist/Catalyst-Plugin-LanguagePrefix/>
+L<http://search.cpan.org/dist/Catalyst-Plugin-I18N-PathPrefix/>
 
 =back
 
@@ -560,4 +560,4 @@ under the same terms as Perl itself.
 
 =cut
 
-1; # End of Catalyst::Plugin::LanguagePrefix
+1; # End of Catalyst::Plugin::I18N::PathPrefix
