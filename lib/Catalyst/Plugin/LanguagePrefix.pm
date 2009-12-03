@@ -300,9 +300,9 @@ sub set_languages_from_language_prefix
 }
 
 
-=head2 uri_in_language_for
+=head2 uri_for_in_language
 
-  $c->uri_in_language_for($language_code => @uri_for_args)
+  $c->uri_for_in_language($language_code => @uri_for_args)
 
 Returns: C<$uri_object>
 
@@ -324,7 +324,7 @@ overriding it can be a significant performance saving. YMMV.
 
 =cut
 
-sub uri_in_language_for
+sub uri_for_in_language
 {
   my ($c, $language_code, @uri_for_args) = (shift, @_);
 
@@ -404,7 +404,7 @@ sub language_switch_options
     map {
       $_ => {
         name => $c->loc(I18N::LangTags::List::name($_)),
-        uri => $c->uri_in_language_for($_ => '/' . $c->req->path),
+        uri => $c->uri_for_in_language($_ => '/' . $c->req->path),
       }
     } map { lc $_ }
       @{ $c->config->{'Plugin::LanguagePrefix'}->{valid_languages} }
@@ -500,7 +500,7 @@ Norbert Buchmüller, C<< <norbi at nix.hu> >>
 
 =over
 
-=item make L</uri_in_language_for> work on language-independent URIs
+=item make L</uri_for_in_language> work on language-independent URIs
 
 =item support locales instead of language codes
 

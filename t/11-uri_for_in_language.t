@@ -14,7 +14,7 @@ use Catalyst::Test 'TestApp';
 use Data::Dumper;
 
 # Each element is a hashref, with the following key-value pairs:
-#   args: An arraryref, the args for C<< $c->uri_in_language_for() >>.
+#   args: An arraryref, the args for C<< $c->uri_for_in_language() >>.
 #   expected_uri: String, the expected URI.
 my @tests = (
   {
@@ -39,7 +39,7 @@ my @tests = (
   {
     args => [ de => '/language_independent_stuff' ],
     expected_uri => 'http://localhost/language_independent_stuff',
-    todo => '$c->uri_in_language_for() currently does not work for '
+    todo => '$c->uri_for_in_language() currently does not work for '
       . 'language independent paths.',
   },
 );
@@ -67,16 +67,16 @@ my @tests = (
     my $uri_for_result_before = $c->uri_for(@{ $test->{args} }[ 1 .. $#{ $test->{args} } ]);
 
     is(
-      $c->uri_in_language_for(@{ $test->{args} }),
+      $c->uri_for_in_language(@{ $test->{args} }),
       $test->{expected_uri},
-      "\$c->uri_in_language_for() returns the expected URI ($test_description)"
+      "\$c->uri_for_in_language() returns the expected URI ($test_description)"
     );
 
     is(
       $c->uri_for(@{ $test->{args} }[ 1 .. $#{ $test->{args} } ]),
       $uri_for_result_before,
       "\$c->uri_for() returns the same URI as before calling "
-        . "\$c->uri_in_language_for() ($test_description)"
+        . "\$c->uri_for_in_language() ($test_description)"
     );
   }
 }
