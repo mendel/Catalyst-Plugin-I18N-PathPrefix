@@ -98,18 +98,24 @@ resort to putting the language selector into the URL.
 You can use these configuration options under the C<'Plugin::LanguagePrefix'>
 key:
 
-=head2 valid_languages => \@language_codes
+=head2 valid_languages
+
+  valid_languages => \@language_codes
 
 The language codes that are accepted as path prefix.
 
-=head2 fallback_language => $language_code
+=head2 fallback_language
+
+  fallback_language => $language_code
 
 The fallback language code used if the URL contains no language prefix and
 L<Catalyst::Plugin::I18N> cannot auto-detect the preferred language from the
 C<Accept-Language> header or none of the detected languages are found in
 L</valid_languages>.
 
-=head2 language_independent_paths => $regex
+=head2 language_independent_paths
+
+  language_independent_paths => $regex
 
 If the URI path is matched by C<$regex>, do not add language prefix and ignore
 if there's one (and pretend as if the URI did not contain any language prefix,
@@ -119,7 +125,9 @@ to remove the prefix from them).
 Use a regex that matches all your paths that return language independent
 information.
 
-=head2 debug => $boolean
+=head2 debug
+
+  debug => $boolean
 
 If set to a true value, L</prepare_path_prefix> logs its actions (using C<<
 $c->log->debug(...) >>).
@@ -260,9 +268,9 @@ sub prepare_path_prefix
 }
 
 
-=head2 set_languages_from_language_prefix(
+=head2 set_languages_from_language_prefix
 
-  $c->set_languages_from_language_prefix($languge_code)
+  $c->set_languages_from_language_prefix($language_code)
 
 Returns: N/A
 
