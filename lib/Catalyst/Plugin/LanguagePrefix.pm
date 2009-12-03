@@ -1,5 +1,7 @@
 package Catalyst::Plugin::LanguagePrefix;
 
+use 5.008;
+
 use Moose::Role;
 use namespace::autoclean;
 
