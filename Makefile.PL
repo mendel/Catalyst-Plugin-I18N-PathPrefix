@@ -21,7 +21,7 @@ requires 'Catalyst::Plugin::I18N' => '0.09';
 requires 'I18N::LangTags::List' => '0.35';
 requires 'Moose' => '0.92';
 requires 'namespace::autoclean' => '0.09';
-requires 'List::Util' => '1.19';
+requires 'List::Util';
 requires 'Scope::Guard' => '0.03';
 
 test_requires 'Test::Most' => '0.21';
@@ -32,7 +32,7 @@ test_requires 'Catalyst::Test' => 0;
 test_requires 'HTTP::Request::Common' => '5.824';
 test_requires 'FindBin';
 test_requires 'Path::Class' => '0.16';
-test_requires 'Data::Dumper' => '2.121_14';
+test_requires 'Data::Dumper';
 
 author_requires 'Test::Pod' => '1.22';
 author_requires 'Test::Pod::Coverage' => '1.08';
