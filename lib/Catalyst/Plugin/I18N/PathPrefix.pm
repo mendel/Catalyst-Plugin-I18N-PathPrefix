@@ -31,16 +31,17 @@ our $VERSION = '0.01';
 =head1 SYNOPSIS
 
   # in MyApp.pm
-  use Catalyst;
-  MyApp->setup( qw/I18N I18N::PathPrefix/ );
-
-  MyApp->config->{'Plugin::I18N::PathPrefix'} => {
-    valid_languages => ['en', 'de', 'fr'],
+  use Catalyst qw/
+    I18N I18N::PathPrefix
+  /;
+  __PACKAGE__->config('Plugin::I18N::PathPrefix' => {
+    valid_languages => [qw/en de fr/],
     fallback_language => 'en',
     language_independent_paths => qr{
         ^( votes/ | captcha/numeric/ )
     }x,
-  };
+  });
+  __PACKAGE__->setup;
 
   # now the language is selected based on requests paths:
   #
@@ -93,8 +94,6 @@ same language on the same URI). So if you want a SEO-optimized multi-lingual
 site, you have to have different (sub)domains for the different languages, or
 resort to putting the language selector into the URL.
 
-=cut
-
 =head1 CONFIGURATION
 
 You can use these configuration options under the C<'Plugin::I18N::PathPrefix'>
@@ -134,12 +133,7 @@ information.
 If set to a true value, L</prepare_path_prefix> logs its actions (using C<<
 $c->log->debug(...) >>).
 
-=cut
-
 =head1 METHODS
-
-=cut
-
 
 =head2 prepare_path
 
@@ -154,7 +148,6 @@ after prepare_path => sub {
 
   $c->prepare_path_prefix;
 };
-
 
 =head2 prepare_path_prefix
 
@@ -492,7 +485,7 @@ sub _language_prefix_debug
 
 =head1 SEE ALSO
 
-L<http://search.cpan.org/perldoc?Catalyst::Plugin::I18N>, L<http://search.cpan.org/perldoc?Catalyst::TraitFor::Request::PerLanguageDomains>
+L<Catalyst::Plugin::I18N>, L<Catalyst::TraitFor::Request::PerLanguageDomains>
 
 =head1 AUTHOR
 
