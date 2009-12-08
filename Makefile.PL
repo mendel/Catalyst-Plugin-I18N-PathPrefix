@@ -30,7 +30,7 @@ test_requires 'Test::Differences' => '0.4801';
 test_requires 'Test::Deep' => '0.103';
 test_requires 'Catalyst::Test' => 0;
 test_requires 'HTTP::Request::Common' => '5.824';
-test_requires 'FindBin' => '1.49';
+test_requires 'FindBin';
 test_requires 'Path::Class' => '0.16';
 test_requires 'Data::Dumper' => '2.121_14';
 
