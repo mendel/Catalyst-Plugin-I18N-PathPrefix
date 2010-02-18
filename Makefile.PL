@@ -37,6 +37,7 @@ test_requires 'Data::Dumper'          => 0;
 author_requires 'Test::Pod'           => '1.22';
 author_requires 'Test::Pod::Coverage' => '1.08';
 author_requires 'Pod::Coverage'       => '0.18';
+author_requires 'Test::Perl::Critic'  => '1.01';
 
 extra_tests;
 
