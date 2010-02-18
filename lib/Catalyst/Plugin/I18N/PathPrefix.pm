@@ -135,9 +135,34 @@ $c->log->debug(...) >>).
 
 =head1 METHODS
 
+=cut
+
+# should be a 'state' var on Perl 5.10+
+my %valid_language_codes;
+
+=head2 setup_finalize
+
+Overridden (wrapped with an an C<after> modifier) from
+L<Catalyst/setup_finalize>.
+
+Sets up the package configuration.
+
+=cut
+
+after setup_finalize => sub {
+  my ($c) = (shift, @_);
+
+  my @valid_language_codes = map { lc $_ }
+    @{ $c->config->{'Plugin::I18N::PathPrefix'}->{valid_languages} };
+
+  # fill the hash for quick lookups
+  @valid_language_codes{ @valid_language_codes } = ();
+};
+
 =head2 prepare_path
 
-Overridden from L<Catalyst/prepare_path>.
+Overridden (wrapped with an an C<after> modifier) from
+L<Catalyst/prepare_path>.
 
 Calls C<< $c->prepare_path_prefix >> after the original method.
 
@@ -187,19 +212,11 @@ with that language code.
 
 =cut
 
-# should be a 'state' var on Perl 5.10+
-my %valid_language_codes;
-
 sub prepare_path_prefix
 {
   my ($c) = (shift, @_);
 
   my $config = $c->config->{'Plugin::I18N::PathPrefix'};
-
-  # fill the hash for quick lookups if not done yet
-  if (!%valid_language_codes) {
-    @valid_language_codes{ map { lc $_ } @{ $config->{valid_languages} } } = ();
-  }
 
   my $language_code = lc $config->{fallback_language};
 
