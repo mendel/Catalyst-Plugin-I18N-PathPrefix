@@ -42,6 +42,11 @@ my @tests = (
     todo => '$c->uri_for_in_language() currently does not work for '
       . 'language independent paths.',
   },
+
+  {
+    args => [ en => '/foo/bar%2Fbaz' ],
+    expected_uri => 'http://localhost/en/foo/bar%2Fbaz',
+  },
 );
 
 {
