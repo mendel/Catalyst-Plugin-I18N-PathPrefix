@@ -416,7 +416,7 @@ sub language_switch_options
     map {
       $_ => {
         name => $c->loc(I18N::LangTags::List::name($_)),
-        uri => $c->uri_for_in_language($_ => '/' . $c->req->path),
+        uri => $c->uri_for_in_language($_ => '/' . $c->req->path, $c->req->params),
       }
     } map { lc $_ }
       @{ $c->config->{'Plugin::I18N::PathPrefix'}->{valid_languages} }

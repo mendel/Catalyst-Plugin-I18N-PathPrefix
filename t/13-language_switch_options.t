@@ -18,23 +18,23 @@ use Data::Dumper;
 #   expected: The expected return value of $c->language_switch_options().
 my @tests = (
   {
-    request_path => '/en/foo/bar',
+    request_path => '/en/foo/bar?baz=42',
     expected => {
       en => {
         name => 'English',
-        uri => str('http://localhost/en/foo/bar'),
+        uri => str('http://localhost/en/foo/bar?baz=42'),
       },
       de => {
         name => 'German',
-        uri => str('http://localhost/de/foo/bar'),
+        uri => str('http://localhost/de/foo/bar?baz=42'),
       },
       fr => {
         name => 'French',
-        uri => str('http://localhost/fr/foo/bar'),
+        uri => str('http://localhost/fr/foo/bar?baz=42'),
       },
       it => {
         name => 'Italian',
-        uri => str('http://localhost/it/foo/bar'),
+        uri => str('http://localhost/it/foo/bar?baz=42'),
       },
     },
   },
