@@ -566,7 +566,7 @@ improvement ideas and mentoring in general.
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2009 Norbert Buchmüller, all rights reserved.
+Copyright 2010 Norbert Buchmüller, all rights reserved.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
