@@ -392,7 +392,7 @@ is a hashref that contains the following key-value pairs:
 
 =item name
 
-The localized (translated) name of the language. (The actual msgids used in C<<
+The localized (translated) name of the language. (The actual msgid used in C<<
 $c->loc() >> is the English name of the language, returned by
 L<I18N::LangTags::List/name>.)
 
