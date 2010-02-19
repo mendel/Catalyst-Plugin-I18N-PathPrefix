@@ -561,6 +561,9 @@ Thanks for Larry Leszczynski for the idea of appending the language prefix to
 C<< $c->req->base >> after it's split off of C<< $c->req->path >>
 (L<http://dev.catalystframework.org/wiki/wikicookbook/urlpathprefixing>).
 
+Thanks for Tomas (t0m) Doran <bobtfish@bobtfish.net> for the code reviews,
+improvement ideas and mentoring in general.
+
 =head1 COPYRIGHT & LICENSE
 
 Copyright 2009 Norbert Buchmüller, all rights reserved.
