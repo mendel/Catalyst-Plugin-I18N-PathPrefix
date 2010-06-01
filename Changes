@@ -1,4 +1,7 @@
 Revision history for Catalyst-Plugin-LanguagePrefix
 
+0.02    2010-06-01 13:37:00+0200
+        Removed non-ASCII chars from POD.
+
 0.01    2010-02-19 01:33:00+0100
         First version. We will see where it goes.

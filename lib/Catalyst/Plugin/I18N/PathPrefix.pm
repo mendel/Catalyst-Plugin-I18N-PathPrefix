@@ -25,7 +25,7 @@ Version 0.01
 
 =cut
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 
 =head1 SYNOPSIS
@@ -506,7 +506,7 @@ L<Catalyst::Plugin::I18N>, L<Catalyst::TraitFor::Request::PerLanguageDomains>
 
 =head1 AUTHOR
 
-Norbert Buchmüller, C<< <norbi at nix.hu> >>
+Norbert Buchmuller, C<< <norbi at nix.hu> >>
 
 =head1 TODO
 
@@ -566,7 +566,7 @@ improvement ideas and mentoring in general.
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2010 Norbert Buchmüller, all rights reserved.
+Copyright 2010 Norbert Buchmuller, all rights reserved.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
