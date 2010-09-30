@@ -21,11 +21,11 @@ Catalyst::Plugin::I18N::PathPrefix - Language prefix in the request path
 
 =head1 VERSION
 
-Version 0.01
+Version 0.03
 
 =cut
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 
 =head1 SYNOPSIS
