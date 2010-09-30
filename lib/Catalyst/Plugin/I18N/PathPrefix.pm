@@ -154,6 +154,8 @@ after setup_finalize => sub {
 
   my $config = $c->config->{'Plugin::I18N::PathPrefix'};
 
+  $config->{fallback_language} = lc $config->{fallback_language};
+
   my @valid_language_codes = map { lc $_ }
     @{ $config->{valid_languages} };
 
@@ -161,7 +163,6 @@ after setup_finalize => sub {
   @{ $config->{_valid_language_codes}}{ @valid_language_codes } = ();
 
   if (!defined $config->{language_independent_paths}) {
-    #FIXME should copy the calculated config instead of modifying it in-place
     $config->{language_independent_paths} = qr/(?!)/; # never matches anything
   }
 };
@@ -225,8 +226,7 @@ sub prepare_path_prefix
 
   my $config = $c->config->{'Plugin::I18N::PathPrefix'};
 
-  #FIXME should copy the calculated config instead of calculating it every time
-  my $language_code = lc $config->{fallback_language};
+  my $language_code = $config->{fallback_language};
 
   my $valid_language_codes = $config->{_valid_language_codes};
 
@@ -252,8 +252,7 @@ sub prepare_path_prefix
       else {
         $c->_language_prefix_debug("path '" . $c->req->path . "' is language independent");
 
-        #FIXME should copy the calculated config instead of calculating it every time
-        $language_code = lc $config->{fallback_language};
+        $language_code = $config->{fallback_language};
       }
 
       # it seems that Catalyst::Request is quirky - we have to explicitly set
