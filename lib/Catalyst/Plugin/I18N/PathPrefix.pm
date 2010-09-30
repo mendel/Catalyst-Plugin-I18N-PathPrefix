@@ -263,7 +263,6 @@ sub prepare_path_prefix
 
       # fake that the request path already contained the language code prefix
       $c->req->uri->path($language_code . '/' . $c->req->path);
-      $c->req->path($language_code . '/' . $c->req->path);
 
       # append the language code to the base
       my $req_base = $c->req->base;
