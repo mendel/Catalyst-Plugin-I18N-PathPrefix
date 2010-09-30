@@ -140,9 +140,6 @@ $c->log->debug(...) >>).
 
 =cut
 
-# should be a 'state' var on Perl 5.10+
-my %valid_language_codes;
-
 =head2 setup_finalize
 
 Overridden (wrapped with an an C<after> modifier) from
@@ -161,7 +158,7 @@ after setup_finalize => sub {
     @{ $config->{valid_languages} };
 
   # fill the hash for quick lookups
-  @valid_language_codes{ @valid_language_codes } = ();
+  @{ $config->{_valid_language_codes}}{ @valid_language_codes } = ();
 
   if (!defined $config->{language_independent_paths}) {
     #FIXME should copy the calculated config instead of modifying it in-place
@@ -231,11 +228,13 @@ sub prepare_path_prefix
   #FIXME should copy the calculated config instead of calculating it every time
   my $language_code = lc $config->{fallback_language};
 
+  my $valid_language_codes = $config->{_valid_language_codes};
+
   if ($c->req->path !~ $config->{language_independent_paths}) {
     my ($prefix, $path) = split m{/}, $c->req->path, 2;
     $prefix = lc $prefix;
 
-    if (defined $prefix && exists $valid_language_codes{$prefix}) {
+    if (defined $prefix && exists $valid_language_codes->{$prefix}) {
       $language_code = $prefix;
 
       $c->_language_prefix_debug("found language prefix '$language_code' "
@@ -264,7 +263,7 @@ sub prepare_path_prefix
     }
     else {
       my $detected_language_code =
-        first { exists $valid_language_codes{$_} }
+        first { exists $valid_language_codes->{$_} }
           map { lc $_ }
             @{ $c->languages };
 
