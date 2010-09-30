@@ -126,6 +126,9 @@ to remove the prefix from them).
 Use a regex that matches all your paths that return language independent
 information.
 
+If you don't set this config option or you set it to an undefined value, no
+paths will be handled as language independent ones.
+
 =head2 debug
 
   debug => $boolean
@@ -152,11 +155,18 @@ Sets up the package configuration.
 after setup_finalize => sub {
   my ($c) = (shift, @_);
 
+  my $config = $c->config->{'Plugin::I18N::PathPrefix'};
+
   my @valid_language_codes = map { lc $_ }
-    @{ $c->config->{'Plugin::I18N::PathPrefix'}->{valid_languages} };
+    @{ $config->{valid_languages} };
 
   # fill the hash for quick lookups
   @valid_language_codes{ @valid_language_codes } = ();
+
+  if (!defined $config->{language_independent_paths}) {
+    #FIXME should copy the calculated config instead of modifying it in-place
+    $config->{language_independent_paths} = qr/(?!)/; # never matches anything
+  }
 };
 
 =head2 prepare_path
@@ -218,6 +228,7 @@ sub prepare_path_prefix
 
   my $config = $c->config->{'Plugin::I18N::PathPrefix'};
 
+  #FIXME should copy the calculated config instead of calculating it every time
   my $language_code = lc $config->{fallback_language};
 
   if ($c->req->path !~ $config->{language_independent_paths}) {
@@ -242,6 +253,7 @@ sub prepare_path_prefix
       else {
         $c->_language_prefix_debug("path '" . $c->req->path . "' is language independent");
 
+        #FIXME should copy the calculated config instead of calculating it every time
         $language_code = lc $config->{fallback_language};
       }
 
