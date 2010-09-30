@@ -252,6 +252,25 @@ my @tests = (
       ],
     },
   },
+  {
+    request => {
+      path => '/',
+      accept_language => ['de'],
+    },
+    expected => {
+      language => 'de',
+      req => {
+        uri => 'http://localhost/de/',
+        base => 'http://localhost/de/',
+        path => '',
+      },
+      action => 'TestApp::Controller::Root::index',
+      log => [
+        debug => 'detected language: \'de\'',
+        debug => 'set language prefix to \'de\'',
+      ],
+    },
+  },
 
   {
     config => {
