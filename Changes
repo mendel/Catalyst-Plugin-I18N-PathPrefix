@@ -1,7 +1,16 @@
 Revision history for Catalyst-Plugin-LanguagePrefix
 
+0.03	2010-09-30 15:19:00+0200
+	- Fixed a bug: used to unnecessarily set $c->req->path to the wrong
+	  value when auto-detecting the language.
+	- Added a test for the request to '/'.
+	- "language_independent_paths" is not mandatory any more.
+	- Fixed how the valid language codes cache is stored.
+	- The "fallback_language" config option is now made lc in
+	  setup_finalize().
+
 0.02    2010-06-01 13:37:00+0200
-        Removed non-ASCII chars from POD.
+        - Removed non-ASCII chars from POD.
 
 0.01    2010-02-19 01:33:00+0100
-        First version. We will see where it goes.
+        - First version. We will see where it goes.
