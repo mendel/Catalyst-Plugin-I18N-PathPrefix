@@ -110,10 +110,10 @@ the request.
 
 =item log
 
-The expected messages logged by the plugin. An arrayref that
-contains pairs of values, where the first value is the log level
-string (see L<Catalyst::Log> for the valid log levels) and the second
-value is the message.
+The expected messages logged by the plugin. If defined, arrayref that contains
+pairs of values, where the first value is the log level string (see
+L<Catalyst::Log> for the valid log levels) and the second value is the message.
+If not defined then the messages are not checked.
 
 =back
 
@@ -192,6 +192,6 @@ sub run_prepare_path_prefix_tests {
       $test->{expected}->{log},
       "The plugin logged only the expected messages during the request "
         . "($test_description)"
-    );
+    ) if defined $test->{expected}->{log};
   }
 }
