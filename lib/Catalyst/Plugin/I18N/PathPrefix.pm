@@ -230,9 +230,11 @@ sub prepare_path_prefix
 
   my $valid_language_codes = $config->{_valid_language_codes};
 
+  #TODO optimization: extract $c->req->path to a var
   if ($c->req->path !~ $config->{language_independent_paths}) {
     my ($prefix, $path) = split m{/}, $c->req->path, 2;
     $prefix = lc $prefix;
+    $path   = '' if !defined $path;
 
     if (defined $prefix && exists $valid_language_codes->{$prefix}) {
       $language_code = $prefix;
@@ -240,25 +242,25 @@ sub prepare_path_prefix
       $c->_language_prefix_debug("found language prefix '$language_code' "
         . "in path '" . $c->req->path . "'");
 
-      # set the path to the remaining path after stripping the language code prefix
-      $c->req->path($path);
-
       # can be a language independent path with surplus language prefix
-      if (!defined $path || $path !~ $config->{language_independent_paths}) {
-        # append the language code to the base
-        my $req_base = $c->req->base;
-        $req_base->path($req_base->path . $language_code . '/');
-      }
-      else {
-        $c->_language_prefix_debug("path '" . $c->req->path . "' is language independent");
+      if ($path =~ $config->{language_independent_paths}) {
+        $c->_language_prefix_debug("path '$path' is language independent");
+
+        # bust the language prefix completely
+        $c->req->uri->path($path);
 
         $language_code = $config->{fallback_language};
       }
+      else {
+        # replace the language prefix with the known lowercase one in $c->req->uri
+        $c->req->uri->path($language_code . '/' . $path);
 
-      # it seems that Catalyst::Request is quirky - we have to explicitly set
-      # $c->req->uri (because setting $c->req->path sets $c->req->uri->path
-      # implicitly)
-      $c->req->uri(URI->new($c->req->base . $c->req->path));
+        # since $c->req->path returns such a string that satisfies
+        # << $c->req->uri->path eq $c->req->base->path . $c->req->path >>
+        # this strips the language code prefix from $c->req->path
+        my $req_base = $c->req->base;
+        $req_base->path($req_base->path . $language_code . '/');
+      }
     }
     else {
       my $detected_language_code =
@@ -272,14 +274,17 @@ sub prepare_path_prefix
       $language_code = $detected_language_code if $detected_language_code;
 
       # fake that the request path already contained the language code prefix
-      $c->req->uri->path($language_code . '/' . $c->req->path);
+      my $req_uri = $c->req->uri;
+      $req_uri->path($language_code . $req_uri->path);
 
-      # append the language code to the base
+      # so that it strips the language code prefix from $c->req->path
       my $req_base = $c->req->base;
       $req_base->path($req_base->path . $language_code . '/');
 
       $c->_language_prefix_debug("set language prefix to '$language_code'");
     }
+
+    $c->req->_clear_path;
   }
   else {
     $c->_language_prefix_debug("path '" . $c->req->path . "' is language independent");
@@ -451,11 +456,12 @@ sub _set_language_prefix
   if ($c->req->path !~
       $c->config->{'Plugin::I18N::PathPrefix'}->{language_independent_paths}) {
     my ($actual_base_path) = $c->req->base->path =~ m{ ^ / [^/]+ (.*) $ }x;
-
     $c->req->base->path($language_code . $actual_base_path);
 
     my ($actual_uri_path) = $c->req->uri->path =~ m{ ^ / [^/]+ (.*) $ }x;
     $c->req->uri->path($language_code . $actual_uri_path);
+
+    $c->req->_clear_path;
   }
 }
 
