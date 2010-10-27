@@ -482,12 +482,12 @@ sub _set_language_prefix_temporarily
 {
   my ($c, $language_code) = (shift, @_);
 
-  my $old_req_uri = $c->req->uri->clone;
-  my $old_req_base = $c->req->base->clone;
+  my $old_req_uri_path = $c->req->uri->path;
+  my $old_req_base_path = $c->req->base->path;
 
   my $scope_guard = Scope::Guard->new(sub {
-    $c->req->uri($old_req_uri);
-    $c->req->base($old_req_base);
+    $c->req->uri->path($old_req_uri_path);
+    $c->req->base->path($old_req_base_path);
   });
 
   $c->_set_language_prefix($language_code);
