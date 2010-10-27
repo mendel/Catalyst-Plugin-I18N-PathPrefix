@@ -230,9 +230,10 @@ sub prepare_path_prefix
 
   my $valid_language_codes = $config->{_valid_language_codes};
 
-  #TODO optimization: extract $c->req->path to a var
-  if ($c->req->path !~ $config->{language_independent_paths}) {
-    my ($prefix, $path) = split m{/}, $c->req->path, 2;
+  my $req_path = $c->req->path;
+
+  if ($req_path !~ $config->{language_independent_paths}) {
+    my ($prefix, $path) = split m{/}, $req_path, 2;
     $prefix = lc $prefix;
     $path   = '' if !defined $path;
 
@@ -240,7 +241,7 @@ sub prepare_path_prefix
       $language_code = $prefix;
 
       $c->_language_prefix_debug("found language prefix '$language_code' "
-        . "in path '" . $c->req->path . "'");
+        . "in path '$req_path'");
 
       # can be a language independent path with surplus language prefix
       if ($path =~ $config->{language_independent_paths}) {
@@ -287,7 +288,7 @@ sub prepare_path_prefix
     $c->req->_clear_path;
   }
   else {
-    $c->_language_prefix_debug("path '" . $c->req->path . "' is language independent");
+    $c->_language_prefix_debug("path '$req_path' is language independent");
   }
 
   $c->set_languages_from_language_prefix($language_code);
