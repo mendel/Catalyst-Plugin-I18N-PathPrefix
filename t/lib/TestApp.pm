@@ -18,7 +18,12 @@ __PACKAGE__->config(
   },
 );
 
-__PACKAGE__->setup( qw(I18N I18N::PathPrefix) );
+my @plugins = qw(I18N I18N::PathPrefix);
+
+# the test file loads it if it wants to test interoperability
+push @plugins, 'I18N::Request' if $INC{'Catalyst/Plugin/I18N/Request.pm'};
+
+__PACKAGE__->setup(@plugins);
 
 has language_prefix_debug_messages => (
   isa => 'ArrayRef[Str]',

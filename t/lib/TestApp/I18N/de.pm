@@ -10,6 +10,12 @@ our %Lexicon = (
   'German'  => 'Deutsch',
   'French'  => 'Franzäsisch',
   'Italian' => 'Italienisch',
+
+  'PATH_localize_foo'    => 'quux',
+  'PATH_delocalize_quux' => 'foo',
+
+  'PATH_localize_bar'    => 'baz',
+  'PATH_delocalize_baz'  => 'bar',
 );
 
 1;

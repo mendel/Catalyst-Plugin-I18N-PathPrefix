@@ -165,6 +165,23 @@ after setup_finalize => sub {
   if (!defined $config->{language_independent_paths}) {
     $config->{language_independent_paths} = qr/(?!)/; # never matches anything
   }
+
+  #FIXME document this ugly hack (in a comment)
+  my $prepare_path = $c->meta->get_method('prepare_path');
+  if ($prepare_path->can('get_original_method')
+      && $prepare_path->get_original_method->package_name
+        eq 'Catalyst::Plugin::I18N::Request'
+  ) {
+    $c->meta->remove_method('prepare_path');
+    $c->meta->add_method(prepare_path => sub {
+      my ($c) = (@_);
+
+      warn "before: \$c->req->uri->path: " . $c->req->uri->path;
+      $c->prepare_path_prefix;
+      $prepare_path->body->(@_);
+      warn "after:  \$c->req->uri->path: " . $c->req->uri->path;
+    });
+  }
 };
 
 =head2 prepare_path
@@ -518,7 +535,8 @@ sub _language_prefix_debug
 
 =head1 SEE ALSO
 
-L<Catalyst::Plugin::I18N>, L<Catalyst::TraitFor::Request::PerLanguageDomains>
+L<Catalyst::Plugin::I18N>, L<Catalyst::TraitFor::Request::PerLanguageDomains>,
+L<Catalyst::Plugin::I18N::Request>
 
 =head1 AUTHOR
 
