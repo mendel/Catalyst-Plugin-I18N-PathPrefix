@@ -1,5 +1,9 @@
 Revision history for Catalyst-Plugin-LanguagePrefix
 
+0.04	2011-05-05 23:49:00+0200
+	- Cleanup, refactoring, optimization.
+	- Added test for RT 67926. (The bug itself got fixed in the meantime.)
+
 0.03	2010-09-30 15:19:00+0200
 	- Fixed a bug: used to unnecessarily set $c->req->path to the wrong
 	  value when auto-detecting the language.
