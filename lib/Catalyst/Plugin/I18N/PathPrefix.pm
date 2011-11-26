@@ -234,7 +234,7 @@ sub prepare_path_prefix
 
   if ($req_path !~ $config->{language_independent_paths}) {
     my ($prefix, $path) = split m{/}, $req_path, 2;
-    $prefix = lc $prefix;
+    $prefix = lc $prefix if defined $prefix;
     $path   = '' if !defined $path;
 
     if (defined $prefix && exists $valid_language_codes->{$prefix}) {
