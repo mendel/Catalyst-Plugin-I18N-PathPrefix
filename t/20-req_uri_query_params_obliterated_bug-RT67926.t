@@ -30,7 +30,7 @@ use Catalyst::Test 'TestApp';
       quux  => 2,
       quuux => 3,
     },
-    "query params are not obliterated"
+    "query params are not obliterated (RT67926)"
   );
 }
 
