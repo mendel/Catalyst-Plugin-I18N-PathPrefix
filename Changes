@@ -1,5 +1,8 @@
 Revision history for Catalyst-Plugin-LanguagePrefix
 
+0.05	2011-11-26 12:30:00+0100
+	- Fixed a warning (RT 71568) that i couldn't reproduce, though.
+
 0.04	2011-05-05 23:49:00+0200
 	- Cleanup, refactoring, optimization.
 	- Added test for RT 67926. (The bug itself got fixed in the meantime.)
