@@ -1,5 +1,8 @@
 Revision history for Catalyst-Plugin-LanguagePrefix
 
+0.06	2011-12-06 18:27:00+0100
+	- Removed disclaimer about alpha quality.
+
 0.05	2011-11-26 12:30:00+0100
 	- Fixed a warning (RT 71568) that i couldn't reproduce, though.
 
