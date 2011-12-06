@@ -65,10 +65,6 @@ our $VERSION = '0.05';
     $c->stash('language_switch' => $c->language_switch_options);
   }
 
-=head1 DISCLAIMER
-
-This is ALPHA SOFTWARE. Use at your own risk. Features may change.
-
 =head1 DESCRIPTION
 
 This module allows you to put the language selector as a prefix to the path part of
