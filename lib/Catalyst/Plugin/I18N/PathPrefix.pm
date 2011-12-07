@@ -9,7 +9,7 @@ requires
   # from Catalyst
   'config', 'prepare_path', 'req', 'uri_for', 'log',
   # from Catalyst::Plugin::I18N
-  'languages', 'language', 'loc';
+  'languages', 'loc';
 
 use List::Util qw(first);
 use Scope::Guard;

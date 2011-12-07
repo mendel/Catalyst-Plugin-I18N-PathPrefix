@@ -4,6 +4,7 @@ use strict;
 use warnings;
 
 use Test::Most;
+use Test::Deep;
 
 use FindBin;
 use Path::Class;
@@ -18,7 +19,7 @@ use Data::Dumper;
 #   new_language: The parameter to $c->switch_language().
 #   expected: A hashref that contains the expected values after $c->switch_language().
 #     It contains following key-value pairs:
-#       language: The expected value of $c->language.
+#       language: The expected single value of $c->languages.
 #       req: The expected value of some $c->req methods. A hashref with the
 #         following key-value pairs:
 #           uri: The expected value of $c->req->uri.
@@ -86,10 +87,10 @@ my @tests = (
       $c->switch_language($test->{new_language});
     } "\c->switch_language() does not die ($test_description)";
 
-    is(
-      $c->language,
-      $test->{expected}->{language},
-      "\$c->language is set to the expected value ($test_description)"
+    cmp_deeply(
+      $c->languages,
+      [ $test->{expected}->{language} ],
+      "\$c->languages is set to the expected value ($test_description)"
     );
 
     is(

@@ -10,6 +10,7 @@ use Catalyst::Test 'TestApp';
 use Data::Dumper;
 
 use Test::Most;
+use Test::Deep;
 
 =head1 NAME
 
@@ -80,7 +81,7 @@ It contains following key-value pairs:
 
 =item language
 
-The expected value of $c->language.
+The expected single value of $c->languages.
 
 =item req
 
@@ -159,10 +160,10 @@ sub run_prepare_path_prefix_tests {
       "Dispatched to the right action ($test_description)"
     );
 
-    is(
-      $c->language,
-      $test->{expected}->{language},
-      "\$c->language is set to the expected value ($test_description)"
+    cmp_deeply(
+      $c->languages,
+      [ $test->{expected}->{language} ],
+      "\$c->languages is set to the expected value ($test_description)"
     );
 
     is(
