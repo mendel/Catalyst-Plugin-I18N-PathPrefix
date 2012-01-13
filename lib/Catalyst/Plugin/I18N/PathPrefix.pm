@@ -305,7 +305,7 @@ always called when C<< $c->languages >> is set by this module).
 You can wrap this method (using eg. the L<Moose/after> method modifier) so you
 can store the language code into the stash if you like:
 
-  after prepare_path_prefix => sub {
+  after set_languages_from_language_prefix => sub {
     my $c = shift;
 
     $c->stash('language' => $c->language);
