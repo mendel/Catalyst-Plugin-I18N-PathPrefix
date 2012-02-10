@@ -9,9 +9,9 @@ use FindBin;
 use Path::Class;
 use lib dir($FindBin::Bin)->subdir('lib')->stringify;
 
-use TestUtils qw(run_prepare_path_prefix_tests);
+use TestUtils qw(run_prepare_path_prefix_and_uri_for_tests);
 
-run_prepare_path_prefix_tests(
+run_prepare_path_prefix_and_uri_for_tests(
   {
     request => {
       path => '/language_independent_stuff',
@@ -30,6 +30,15 @@ run_prepare_path_prefix_tests(
           'path \'language_independent_stuff\' '
             . 'is language independent',
       ],
+      uri_for => {
+        '/language_independent_stuff' =>
+          'http://localhost/language_independent_stuff',
+        '/static/language_independent_things' =>
+          'http://localhost/static/language_independent_things',
+        '/static/quux'                => 'http://localhost/de/static/quux',
+        '/foo/bar'                    => 'http://localhost/de/foo/bar',
+        '/'                           => 'http://localhost/de/',
+      },
     },
   },
   {
@@ -52,6 +61,15 @@ run_prepare_path_prefix_tests(
           'path \'language_independent_stuff\' '
             . 'is language independent',
       ],
+      uri_for => {
+        '/language_independent_stuff' =>
+          'http://localhost/language_independent_stuff',
+        '/static/language_independent_things' =>
+          'http://localhost/static/language_independent_things',
+        '/static/quux'                => 'http://localhost/en/static/quux',
+        '/foo/bar'                    => 'http://localhost/en/foo/bar',
+        '/'                           => 'http://localhost/en/',
+      },
     },
   },
   {
@@ -75,6 +93,15 @@ run_prepare_path_prefix_tests(
           'path \'language_independent_stuff\' '
             . 'is language independent',
       ],
+      uri_for => {
+        '/language_independent_stuff' =>
+          'http://localhost/language_independent_stuff',
+        '/static/language_independent_things' =>
+          'http://localhost/static/language_independent_things',
+        '/static/quux'                => 'http://localhost/de/static/quux',
+        '/foo/bar'                    => 'http://localhost/de/foo/bar',
+        '/'                           => 'http://localhost/de/',
+      },
     },
   },
 
@@ -98,6 +125,15 @@ run_prepare_path_prefix_tests(
         debug => 'detected language: \'de\'',
         debug => 'set language prefix to \'de\'',
       ],
+      uri_for => {
+        '/language_independent_stuff' =>
+          'http://localhost/de/language_independent_stuff',
+        '/static/language_independent_things' =>
+          'http://localhost/de/static/language_independent_things',
+        '/static/quux'                => 'http://localhost/de/static/quux',
+        '/foo/bar'                    => 'http://localhost/de/foo/bar',
+        '/'                           => 'http://localhost/de/',
+      },
     },
   },
 
@@ -117,6 +153,15 @@ run_prepare_path_prefix_tests(
       log => [
         debug => 'found language prefix \'fr\' in path \'fr\'',
       ],
+      uri_for => {
+        '/language_independent_stuff' =>
+          'http://localhost/language_independent_stuff',
+        '/static/language_independent_things' =>
+          'http://localhost/static/language_independent_things',
+        '/static/quux'                => 'http://localhost/fr/static/quux',
+        '/foo/bar'                    => 'http://localhost/fr/foo/bar',
+        '/'                           => 'http://localhost/fr/',
+      },
     },
   },
   {
@@ -135,6 +180,15 @@ run_prepare_path_prefix_tests(
       log => [
         debug => 'found language prefix \'fr\' in path \'fr/\'',
       ],
+      uri_for => {
+        '/language_independent_stuff' =>
+          'http://localhost/language_independent_stuff',
+        '/static/language_independent_things' =>
+          'http://localhost/static/language_independent_things',
+        '/static/quux'                => 'http://localhost/fr/static/quux',
+        '/foo/bar'                    => 'http://localhost/fr/foo/bar',
+        '/'                           => 'http://localhost/fr/',
+      },
     },
   },
   {
@@ -153,6 +207,15 @@ run_prepare_path_prefix_tests(
       log => [
         debug => 'found language prefix \'fr\' in path \'fr/foo/bar\'',
       ],
+      uri_for => {
+        '/language_independent_stuff' =>
+          'http://localhost/language_independent_stuff',
+        '/static/language_independent_things' =>
+          'http://localhost/static/language_independent_things',
+        '/static/quux'                => 'http://localhost/fr/static/quux',
+        '/foo/bar'                    => 'http://localhost/fr/foo/bar',
+        '/'                           => 'http://localhost/fr/',
+      },
     },
   },
   {
@@ -171,6 +234,15 @@ run_prepare_path_prefix_tests(
       log => [
         debug => 'found language prefix \'fr\' in path \'FR/foo/bar\'',
       ],
+      uri_for => {
+        '/language_independent_stuff' =>
+          'http://localhost/language_independent_stuff',
+        '/static/language_independent_things' =>
+          'http://localhost/static/language_independent_things',
+        '/static/quux'                => 'http://localhost/fr/static/quux',
+        '/foo/bar'                    => 'http://localhost/fr/foo/bar',
+        '/'                           => 'http://localhost/fr/',
+      },
     },
   },
   {
@@ -189,6 +261,15 @@ run_prepare_path_prefix_tests(
       log => [
         debug => 'found language prefix \'it\' in path \'it/foo/bar\'',
       ],
+      uri_for => {
+        '/language_independent_stuff' =>
+          'http://localhost/language_independent_stuff',
+        '/static/language_independent_things' =>
+          'http://localhost/static/language_independent_things',
+        '/static/quux'                => 'http://localhost/it/static/quux',
+        '/foo/bar'                    => 'http://localhost/it/foo/bar',
+        '/'                           => 'http://localhost/it/',
+      },
     },
   },
 
@@ -209,6 +290,15 @@ run_prepare_path_prefix_tests(
         debug => 'detected language: \'de\'',
         debug => 'set language prefix to \'de\'',
       ],
+      uri_for => {
+        '/language_independent_stuff' =>
+          'http://localhost/language_independent_stuff',
+        '/static/language_independent_things' =>
+          'http://localhost/static/language_independent_things',
+        '/static/quux'                => 'http://localhost/de/static/quux',
+        '/foo/bar'                    => 'http://localhost/de/foo/bar',
+        '/'                           => 'http://localhost/de/',
+      },
     },
   },
 
@@ -229,6 +319,15 @@ run_prepare_path_prefix_tests(
         debug => 'detected language: \'de\'',
         debug => 'set language prefix to \'de\'',
       ],
+      uri_for => {
+        '/language_independent_stuff' =>
+          'http://localhost/language_independent_stuff',
+        '/static/language_independent_things' =>
+          'http://localhost/static/language_independent_things',
+        '/static/quux'                => 'http://localhost/de/static/quux',
+        '/foo/bar'                    => 'http://localhost/de/foo/bar',
+        '/'                           => 'http://localhost/de/',
+      },
     },
   },
   {
@@ -248,6 +347,15 @@ run_prepare_path_prefix_tests(
         debug => 'detected language: N/A',
         debug => 'set language prefix to \'en\'',
       ],
+      uri_for => {
+        '/language_independent_stuff' =>
+          'http://localhost/language_independent_stuff',
+        '/static/language_independent_things' =>
+          'http://localhost/static/language_independent_things',
+        '/static/quux'                => 'http://localhost/en/static/quux',
+        '/foo/bar'                    => 'http://localhost/en/foo/bar',
+        '/'                           => 'http://localhost/en/',
+      },
     },
   },
   {
@@ -267,6 +375,15 @@ run_prepare_path_prefix_tests(
         debug => 'detected language: \'de\'',
         debug => 'set language prefix to \'de\'',
       ],
+      uri_for => {
+        '/language_independent_stuff' =>
+          'http://localhost/language_independent_stuff',
+        '/static/language_independent_things' =>
+          'http://localhost/static/language_independent_things',
+        '/static/quux'                => 'http://localhost/de/static/quux',
+        '/foo/bar'                    => 'http://localhost/de/foo/bar',
+        '/'                           => 'http://localhost/de/',
+      },
     },
   },
 
@@ -291,6 +408,15 @@ run_prepare_path_prefix_tests(
           'path \'language_independent_stuff\' '
             . 'is language independent',
       ],
+      uri_for => {
+        '/language_independent_stuff' =>
+          'http://localhost/language_independent_stuff',
+        '/static/language_independent_things' =>
+          'http://localhost/static/language_independent_things',
+        '/static/quux'                => 'http://localhost/fr/static/quux',
+        '/foo/bar'                    => 'http://localhost/fr/foo/bar',
+        '/'                           => 'http://localhost/fr/',
+      },
     },
   },
 
@@ -314,6 +440,15 @@ run_prepare_path_prefix_tests(
         debug => 'detected language: N/A',
         debug => 'set language prefix to \'fr\'',
       ],
+      uri_for => {
+        '/language_independent_stuff' =>
+          'http://localhost/language_independent_stuff',
+        '/static/language_independent_things' =>
+          'http://localhost/static/language_independent_things',
+        '/static/quux'                => 'http://localhost/fr/static/quux',
+        '/foo/bar'                    => 'http://localhost/fr/foo/bar',
+        '/'                           => 'http://localhost/fr/',
+      },
     },
   },
 );

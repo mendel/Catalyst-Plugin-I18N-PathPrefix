@@ -1,4 +1,8 @@
 package Catalyst::Plugin::I18N::PathPrefix;
+#FIXME add uri_for wrapper
+#FIXME add note to discourage uri_for in favour of uri_for_action: "realistically you could put a big note in your modules' documentation saying WE STRONGLY DISRECOMMEND USING c.uri_for() with hardcoded paths if you use this module (excepting static resources)"
+#FIXME document assumption that the user must have lexicons for all languages in valid_languages
+#FIXME drop valid_languages config parameter and instead use $c->installed_languages from C:P:I18N
 
 use 5.008;
 
@@ -116,8 +120,8 @@ L</valid_languages>.
 
 If the URI path is matched by C<$regex>, do not add language prefix and ignore
 if there's one (and pretend as if the URI did not contain any language prefix,
-ie.  rewrite C<< $c->req->uri >>, C<< $c->req->base >> and C<< $c->req->path >>
-to remove the prefix from them).
+ie. rewrite C<< $c->req->uri >>, C<< $c->req->base >> and C<< $c->req->path >>
+to remove the prefix from them). Note that language detection will still apply [FIXME - this does not make sense. in a language-independent controller action one must not generate URIs to language dependent stuff - it does not make sense, and also things will break if one generates such an URL. we lose the already detected language when generating the URL to a language-independent resource, so at the point when the request to that resource is processed, we lack the language info.]
 
 Use a regex that matches all your paths that return language independent
 information.
@@ -323,6 +327,34 @@ sub set_languages_from_language_prefix
 }
 
 
+=head2 uri_for
+
+  $c->uri_for($language_code => @uri_for_args)
+
+Returns: C<$uri_object>
+
+Overridden from L<Catalyst/uri_for> with an L<Moose/around> method modifier.
+Tweaks the URI returned by L<Catalyst/uri_for> if necessary.
+
+=cut
+
+around uri_for => sub
+{
+  my ($orig, $c, @uri_for_args) = (shift, shift, @_);
+
+  my $uri = $c->$orig(@_);
+
+  #FIXME it would make sense to cache the language-independent $c->req->base (ie. the one w/o the path prefix suffixed to it) somewhere in $c (like $c->{'Plugin::PathPrefix'}->{orig_req_base}, or even better to use some per-request storage module); then it whould be cheaper compare if $uri starts with that string (still has to check if it starts with the language suffixed req base, as that's what Catalyst/uri_for does itself when the language code is in req base)
+  my $req_base = $c->req->base;
+  if ( substr($uri->path, 0, length($req_base)) eq $req_base
+    || substr($uri->path, 0, length($req_base) - length($c->language) - 1) eq $req_base
+  ) {
+  }
+
+  return $uri;
+};
+
+
 =head2 uri_for_in_language
 
   $c->uri_for_in_language($language_code => @uri_for_args)
@@ -339,11 +371,6 @@ very infrequently.
 Note: You should not call this method to generate language-independent paths,
 as it will generate invalid URLs currently (ie. the language independent path
 prefixed with the language prefix).
-
-Note: This module intentionally does not override L<Catalyst/uri_for> but
-provides this method instead: L<Catalyst/uri_for> is usually called many times
-per request, and most of the cases you want it to use the current language; not
-overriding it can be a significant performance saving. YMMV.
 
 =cut
 

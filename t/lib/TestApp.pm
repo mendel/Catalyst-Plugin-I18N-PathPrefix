@@ -13,7 +13,7 @@ __PACKAGE__->config(
     valid_languages => ['en', 'de', 'fr', 'IT'],
     fallback_language => 'en',
     language_independent_paths => qr{
-      ^ language_independent_stuff
+      ^ ( language_independent_stuff | static/language_independent_things )
     }x,
   },
 );

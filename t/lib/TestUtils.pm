@@ -18,27 +18,27 @@ TestUtils - Utilities for testing Catalyst::Plugin::I18N::PathPrefix
 
 =head1 SYNOPSIS
 
-  run_prepare_path_prefix_tests(@tests);
+  run_prepare_path_prefix_and_uri_for_tests(@tests);
 
 =head1 DESCRIPTION
 
 =head1 EXPORTS
 
-Optional exports: L</run_prepare_path_prefix_tests>
+Optional exports: L</run_prepare_path_prefix_and_uri_for_tests>
 
 =cut
 
 our @EXPORT_OK = qw/
-  &run_prepare_path_prefix_tests
+  &run_prepare_path_prefix_and_uri_for_tests
 /;
 
 =head1 METHODS
 
 =cut
 
-=head2 run_prepare_path_prefix_tests
+=head2 run_prepare_path_prefix_and_uri_for_tests
 
-  run_prepare_path_prefix_tests(@tests);
+  run_prepare_path_prefix_and_uri_for_tests(@tests);
 
 Runs all the tests in C<@tests>.
 
@@ -116,11 +116,17 @@ pairs of values, where the first value is the log level string (see
 L<Catalyst::Log> for the valid log levels) and the second value is the message.
 If not defined then the messages are not checked.
 
+=item uri_for
+
+The expected behaviour of C<< $c->uri_for(...) >>. A hashref where the keys are
+the arguments to C<< $c->uri_for() >> and the values are the expected return
+values of it.
+
 =back
 
 =cut
 
-sub run_prepare_path_prefix_tests {
+sub run_prepare_path_prefix_and_uri_for_tests {
   my (@tests) = @_;
 
   local $Test::Builder::Level = $Test::Builder::Level + 1;
@@ -187,6 +193,16 @@ sub run_prepare_path_prefix_tests {
       $test->{expected}->{req}->{path},
       "\$c->req->path is set to the expected value ($test_description)"
     );
+
+    while (
+      my ($path, $expected_uri) = each %{ $test->{expected}->{uri_for} || {} }
+    ) {
+      is(
+        $c->uri_for($path)->as_string,
+        $expected_uri, 
+        "\$c->uri_for('$path') works as expected ($test_description)"
+      );
+    }
 
     eq_or_diff(
       $c->language_prefix_debug_messages,
