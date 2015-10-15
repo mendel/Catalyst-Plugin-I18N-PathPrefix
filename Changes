@@ -1,5 +1,8 @@
 Revision history for Catalyst-Plugin-LanguagePrefix
 
+0.08	2015-10-13 19:15:00+0100 - Runar Buvik
+	- Support for redirecting users to url with language prefix if the language prefix is missing.
+
 0.07	2011-12-07 17:37:00+0100
 	- Removed requirement for the 'language' method.
 
