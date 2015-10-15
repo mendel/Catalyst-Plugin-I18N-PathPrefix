@@ -21,11 +21,11 @@ Catalyst::Plugin::I18N::PathPrefix - Language prefix in the request path
 
 =head1 VERSION
 
-Version 0.07
+Version 0.08
 
 =cut
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 
 =head1 SYNOPSIS
@@ -53,10 +53,16 @@ our $VERSION = '0.07';
   #
   # http://www.example.com/fr/foo/bar -> sets $c->language to 'fr',
   #                                      dispatcher sees /foo/bar
-  #
+  
+
   # http://www.example.com/foo/bar    -> sets $c->language from
   #                                      Accept-Language header,
   #                                      dispatcher sees /foo/bar
+  #
+  # or if redirect_to_language_url == 1:
+  #
+  # http://www.example.com/foo/bar    -> redirect to http://www.example.com/xx/foo/bar
+  #                                      where xx is language from Accept-Language header
 
   # in a controller
   sub language_switch : Private
@@ -124,6 +130,17 @@ information.
 
 If you don't set this config option or you set it to an undefined value, no
 paths will be handled as language independent ones.
+
+=head2 redirect_to_language_url
+
+  redirect_to_language_url => 1
+
+Redirect users to url with language prefix.
+
+Without redirect_to_language_url users may access your site using bout urls with a 
+language selector and without. This may be bad for search engine optimization because 
+search engines will have a hard time determine the original source for documents. 
+Setting redirect_to_language_url will redirect users to a url with language prefix.
 
 =head2 debug
 
@@ -278,7 +295,14 @@ sub prepare_path_prefix
       my $req_base = $c->req->base;
       $req_base->path($req_base->path . $language_code . '/');
 
-      $c->_language_prefix_debug("set language prefix to '$language_code'");
+      if ($config->{redirect_to_language_url}) {
+         $c->_language_prefix_debug("redirect to language url '$req_uri'");   
+         $c->response->redirect( $req_uri ); 
+         return;
+      }
+      else {
+        $c->_language_prefix_debug("set language prefix to '$language_code'");
+      }
     }
 
     $c->req->_clear_path;
